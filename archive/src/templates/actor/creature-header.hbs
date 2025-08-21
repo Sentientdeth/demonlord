@@ -1,0 +1,40 @@
+<div class="actor-header" >
+
+  <div class="row">
+    <div class="col-10 actor-name">
+      <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'DL.CharName'}}"/>
+    </div>
+    <div class="col-2 creature-difficulty ">
+      <label>{{localize "DL.CreatureDifficulty"}}</label>
+      <input name="system.difficulty" type="number" value="{{system.difficulty}}" min="1"/>
+    </div>
+  </div>
+
+  <div class="row creature-descriptors">
+    <div class="col-6">
+      <input name="system.descriptor" value="{{system.descriptor}}" placeholder="{{localize 'DL.CreatureDescriptor'}}"/>
+    </div>
+    <div class="col-6">
+      <input name="system.perceptionsenses" value="{{system.perceptionsenses}}" placeholder="{{localize 'DL.CreaturePerceptionSenses'}}"/>
+    </div>
+  </div>
+
+  <div class="row-10">
+    {{#*inline "attribute-partial"}}
+      <div class="col-2 attribute" style="margin-top: 8px">
+        <label class="name" data-key="{{n}}">{{attr.label}}</label>
+        <input type="{{ifThen attr.immune "text" "Number"}}" name="system.attributes.{{n}}.value" value="{{ifThen attr.immune "-" attr.value}}" {{disabled attr.immune}}/>
+        {{#unless attr.immune}}
+          <label class="modifier">{{plusify attr.modifier}}</label>
+        {{/unless}}
+      </div>
+    {{/inline}}
+
+    {{> attribute-partial attr=system.attributes.strength    n='strength'}}
+    {{> attribute-partial attr=system.attributes.agility     n='agility'}}
+    {{> attribute-partial attr=system.attributes.intellect   n='intellect'}}
+    {{> attribute-partial attr=system.attributes.will        n='will'}}
+    {{> attribute-partial attr=system.attributes.perception  n='perception'}}
+  </div>
+
+</div>

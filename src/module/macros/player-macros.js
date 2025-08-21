@@ -11,7 +11,7 @@ export function makeChallengeRollMacro() {
     else {
       await Promise.all(selected.forEach(async s => {
         const a = s.actor
-        await a.rollAttributeChallenge(a.getAttribute(attributeName), boonsbanes, 0)
+        await a.rollAttribute(a.getAttribute(attributeName), boonsbanes, 0)
       }))
     }
   }

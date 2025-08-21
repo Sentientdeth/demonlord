@@ -1,32 +1,6 @@
 import {buildAttackEffectsMessage, buildAttributeEffectsMessage, buildTalentEffectsMessage} from './effect-messages'
 import {buildActorInfo, formatDice, getChatBaseData} from './base-messages'
 
-function changeBobDieColour (attackRoll)
-{
-  if (attackRoll === null || attackRoll === undefined ) return attackRoll
-  if (game.settings.get('demonlord', 'colourBoBDieDSN')) {
-    let d6Index = 0
-    let bgColor = game.settings.get('demonlord', 'baneColour')
-    if (game.modules.get('dice-so-nice')?.active) {
-      if (attackRoll._formula.includes('d6kh') || attackRoll._formula.includes('d6r1kh') || attackRoll._formula.includes('d3kh') || attackRoll._formula.includes('d3r1kh')) {
-        let operator = attackRoll.terms[attackRoll.terms.length - 2].operator
-
-        if (operator === '+') bgColor = game.settings.get('demonlord', 'boonColour')
-
-        for (let die of attackRoll.dice) {
-          if (die._faces === 6) d6Index++
-        }        
-
-        attackRoll.dice[d6Index].options.appearance = {
-          background: bgColor,
-          outline: bgColor,
-        }          
-      }
-    }
-  }
-  return attackRoll
-}
-
 /**
  * Generates and sends the chat message for an ATTACK
  * @param attacker              DemonlordActor
@@ -36,10 +10,7 @@ function changeBobDieColour (attackRoll)
  * @param attackAttribute       string (lowercase)
  * @param defenseAttribute      stromg (lowercase)
  */
-export function postAttackToChat(attacker, defender, item, attackRoll, attackAttribute, defenseAttribute, inputBoons, inputModifier) {
-
-  attackRoll = changeBobDieColour (attackRoll)
-
+export function postAttackToChat(attacker, defender, item, attackRoll, attackAttribute, defenseAttribute, inputBoons) {
   const itemData = item.system
   const rollMode = game.settings.get('core', 'rollMode')
 
@@ -54,7 +25,7 @@ export function postAttackToChat(attacker, defender, item, attackRoll, attackAtt
       ? defender?.system.characteristics.defense
       : defender?.getAttribute(defenseAttribute)?.value || ''
 
-  const plus20 = attackRoll?.total >= 20 && (targetNumber ? attackRoll?.total > targetNumber + (game.settings.get('demonlord', 'optionalRuleExceedsByFive') ? 5 : 4) : true)
+  const plus20 = attackRoll?.total >= 20 && attackRoll?.total > targetNumber + 5
   const didHit = voidRoll ? false : attackRoll?.total >= targetNumber
 
   let diceTotalGM = attackRoll?.total ?? ''
@@ -73,12 +44,9 @@ export function postAttackToChat(attacker, defender, item, attackRoll, attackAtt
   let extraDamage = (attacker.system.bonuses.attack.damage.weapon ?? '') + (attacker.system.bonuses.attack.damage.all ?? '')
   let extraDamage20Plus = (attacker.system.bonuses.attack.plus20Damage.weapon ?? '') + (attacker.system.bonuses.attack.plus20Damage.all ?? '')
 
-  if (extraDamage.charAt(0).search(/[0-9]/i) === 0) extraDamage = '+' + extraDamage
-
   const templateData = {
     actor: attacker,
-    tokenId: attacker.token ? attacker.token.uuid : null,
-    item: item,
+    item: {id: item._id, data: item, name: item.name, uuid: item.uuid},
     data: {},
     diceData: formatDice(attackRoll),
   }
@@ -111,7 +79,7 @@ export function postAttackToChat(attacker, defender, item, attackRoll, attackAtt
   data['isPlus20Roll'] = plus20
   data['hasTarget'] = targetNumber !== undefined
   data['effects'] = attacker.system.bonuses.attack.extraEffect
-  data['attackEffects'] = buildAttackEffectsMessage(attacker, defender, item, attackAttribute, defenseAttribute, inputBoons, plus20, inputModifier)
+  data['attackEffects'] = buildAttackEffectsMessage(attacker, defender, item, attackAttribute, defenseAttribute, inputBoons, plus20)
   data['armorEffects'] = '' // TODO
   data['afflictionEffects'] = '' //TODO
   data['ifBlindedRoll'] = rollMode === 'blindroll'
@@ -124,7 +92,7 @@ export function postAttackToChat(attacker, defender, item, attackRoll, attackAtt
     chatData.rolls = [attackRoll]
   }
   const template = 'systems/demonlord/templates/chat/combat.hbs'
-  return foundry.applications.handlebars.renderTemplate(template, templateData).then(content => {
+  return renderTemplate(template, templateData).then(content => {
     chatData.content = content
     chatData.sound = CONFIG.sounds.dice
     ChatMessage.create(chatData)
@@ -139,31 +107,23 @@ export function postAttackToChat(attacker, defender, item, attackRoll, attackAtt
  * @param attribute         string (lowercase)
  * @param challengeRoll     Roll
  */
-export function postAttributeToChat(actor, attribute, challengeRoll, inputBoons, inputModifier = 9) {
-
-  let targetNumber = 10
-
-  if (game.settings.get('demonlord', 'optionalRuleDieRollsMode') === 'b') targetNumber = 11
-
-  challengeRoll = changeBobDieColour (challengeRoll)  
-
+export function postAttributeToChat(actor, attribute, challengeRoll, inputBoons) {
   const rollMode = game.settings.get('core', 'rollMode')
 
   const voidRoll = actor.getAttribute(attribute)?.immune
 
   let diceTotal = challengeRoll?.total ?? ''
   let resultTextGM =
-    challengeRoll.total >= targetNumber && !voidRoll ? game.i18n.localize('DL.DiceResultSuccess') : game.i18n.localize('DL.DiceResultFailure')
+    challengeRoll.total >= 10 && !voidRoll ? game.i18n.localize('DL.DiceResultSuccess') : game.i18n.localize('DL.DiceResultFailure')
 
   let resultText = resultTextGM
   if (rollMode === 'blindroll') {
     diceTotal = '?'
     resultText = ''
   }
-  const resultBoxClass = voidRoll ? 'FAILURE' : (resultText === '' ? '' : challengeRoll.total >= targetNumber ? 'SUCCESS' : 'FAILURE')
+  const resultBoxClass = voidRoll ? 'FAILURE' : (resultText === '' ? '' : challengeRoll.total >= 10 ? 'SUCCESS' : 'FAILURE')
   const templateData = {
     actor: actor,
-    tokenId: actor.token ? actor.token.uuid : null,
     item: {name: attribute?.toUpperCase()},
     diceData: formatDice(challengeRoll),
     data: {},
@@ -176,17 +136,16 @@ export function postAttributeToChat(actor, attribute, challengeRoll, inputBoons,
   data['resultTextGM'] = resultTextGM
   data['resultBoxClass'] = resultBoxClass
   data['isCreature'] = actor.type === 'creature'
-  data['actionEffects'] = buildAttributeEffectsMessage(actor, attribute, inputBoons, inputModifier)
+  data['actionEffects'] = buildAttributeEffectsMessage(actor, attribute, inputBoons)
   data['ifBlindedRoll'] = rollMode === 'blindroll'
   data['actorInfo'] = buildActorInfo(actor)
-  data['targetNumber'] = targetNumber
 
   const chatData = getChatBaseData(actor, rollMode)
   if (challengeRoll) {
     chatData.rolls = [challengeRoll]
   }
   const template = 'systems/demonlord/templates/chat/challenge.hbs'
-  foundry.applications.handlebars.renderTemplate(template, templateData).then(content => {
+  renderTemplate(template, templateData).then(content => {
     chatData.content = content
     chatData.sound = CONFIG.sounds.dice
     ChatMessage.create(chatData)
@@ -203,9 +162,6 @@ export function postAttributeToChat(actor, attribute, challengeRoll, inputBoons,
  * @param target        DemonlordActor
  */
 export function postTalentToChat(actor, talent, attackRoll, target, inputBoons) {
-
-  attackRoll = changeBobDieColour (attackRoll)
-
   const talentData = talent.system
   const rollMode = game.settings.get('core', 'rollMode')
 
@@ -225,7 +181,7 @@ export function postTalentToChat(actor, talent, attackRoll, target, inputBoons) 
   }
 
   const targetNumber = talentData?.action?.attack ? actor.getTargetNumber(talent) : ''
-  const plus20 = attackRoll?.total >= 20 && (targetNumber ? attackRoll?.total > targetNumber + (game.settings.get('demonlord', 'optionalRuleExceedsByFive') ? 5 : 4) : true)
+  const plus20 = attackRoll?.total >= 20 && attackRoll?.total > targetNumber + 5
 
   let resultText =
     !voidRoll && attackRoll != null && targetNumber !== undefined && attackRoll.total >= parseInt(targetNumber)
@@ -247,11 +203,8 @@ export function postTalentToChat(actor, talent, attackRoll, target, inputBoons) 
   let extraDamage = (actor.system.bonuses.attack.damage.talent ?? '') + (actor.system.bonuses.attack.damage.all ?? '')
   let extraDamage20Plus = (actor.system.bonuses.attack.plus20Damage.talent ?? '') + (actor.system.bonuses.attack.plus20Damage.all ?? '')
 
-  if (extraDamage.charAt(0).search(/[0-9]/i) === 0) extraDamage = '+' + extraDamage
-
   const templateData = {
     actor: actor,
-    tokenId: actor.token ? actor.token.uuid : null,
     item: talent,
     data: {},
     diceData: formatDice(attackRoll || null),
@@ -302,7 +255,7 @@ export function postTalentToChat(actor, talent, attackRoll, target, inputBoons) 
   }
   if (talentData?.damage || talentData?.action?.attack || (!talentData?.action?.attack && !talentData?.damage)) {
     const template = 'systems/demonlord/templates/chat/talent.hbs'
-    return foundry.applications.handlebars.renderTemplate(template, templateData).then(content => {
+    return renderTemplate(template, templateData).then(content => {
       chatData.content = content
       if (attackRoll != null) {
         chatData.sound = CONFIG.sounds.dice
@@ -322,9 +275,6 @@ export function postTalentToChat(actor, talent, attackRoll, target, inputBoons) 
  * @param target
  */
 export async function postSpellToChat(actor, spell, attackRoll, target, inputBoons) {
-
-  attackRoll = changeBobDieColour (attackRoll)
-
   const spellData = spell.system
   const rollMode = game.settings.get('core', 'rollMode')
 
@@ -342,7 +292,7 @@ export async function postSpellToChat(actor, spell, attackRoll, target, inputBoo
   if (uses >= 0 && usesMax > 0) usesText = game.i18n.localize('DL.SpellCastingsUses') + ': ' + uses + ' / ' + usesMax
 
   const targetNumber = actor.getTargetNumber(spell)
-  const plus20 = attackRoll?.total >= 20 && (targetNumber ? attackRoll?.total > targetNumber + (game.settings.get('demonlord', 'optionalRuleExceedsByFive') ? 5 : 4) : true)
+  const plus20 = attackRoll?.total >= 20 && attackRoll?.total > targetNumber + 5
 
   let resultText =
     !voidRoll && targetNumber && attackRoll?.total >= parseInt(targetNumber)
@@ -370,11 +320,8 @@ export async function postSpellToChat(actor, spell, attackRoll, target, inputBoo
   let extraDamage = (actor.system.bonuses.attack.damage.spell ?? '') + (actor.system.bonuses.attack.damage.all ?? '')
   let extraDamage20Plus = (actor.system.bonuses.attack.plus20Damage.spell ?? '') + (actor.system.bonuses.attack.plus20Damage.all ?? '')
 
-  if (extraDamage.charAt(0).search(/[0-9]/i) === 0) extraDamage = '+' + extraDamage
-
   const templateData = {
     actor: actor,
-    tokenId: actor.token ? actor.token.uuid : null,
     item: spell,
     data: {},
     diceData: formatDice(attackRoll),
@@ -422,7 +369,7 @@ export async function postSpellToChat(actor, spell, attackRoll, target, inputBoo
   data['isCreature'] = actor.type === 'creature'
   data['isPlus20Roll'] = plus20
   data['effectdice'] = effectdice
-  data['effects'] = actor.system.bonuses.attack.extraEffect
+  data['effects'] = '' // FIXME: what to put in here??
   data['attackEffects'] = buildAttackEffectsMessage(actor, target, spell, attackAttribute, defenseAttribute, inputBoons, plus20)
   data['ifBlindedRoll'] = rollMode === 'blindroll'
   data['hasAreaTarget'] = spellData?.activatedEffect?.target?.type in CONFIG.DL.actionAreaShape
@@ -434,7 +381,7 @@ export async function postSpellToChat(actor, spell, attackRoll, target, inputBoo
     chatData.rolls = [attackRoll]
   }
   const template = 'systems/demonlord/templates/chat/spell.hbs'
-  foundry.applications.handlebars.renderTemplate(template, templateData).then(content => {
+  renderTemplate(template, templateData).then(content => {
     chatData.content = content
     if (attackRoll != null && attackAttribute) {
       chatData.sound = CONFIG.sounds.dice
@@ -472,7 +419,7 @@ export async function postCorruptionToChat(actor, corruptionRoll) {
   }
   const template = 'systems/demonlord/templates/chat/corruption.hbs'
 
-  chatData.content = await foundry.applications.handlebars.renderTemplate(template, templateData)
+  chatData.content = await renderTemplate(template, templateData)
   chatData.sound = CONFIG.sounds.dice
   await ChatMessage.create(chatData)
 
@@ -495,41 +442,6 @@ export async function postCorruptionToChat(actor, corruptionRoll) {
   }
 }
 
-export async function postFortuneToChat(actor, awarded) {
-  const templateData = {
-    actor: actor,
-    data: {},
-  }
-  const data = templateData.data
-  data['actorInfo'] = buildActorInfo(actor)
-  data['awarded'] = awarded
-  
-  const rollMode = game.settings.get('core', 'rollMode')
-  const chatData = getChatBaseData(actor, rollMode)
-  const template = 'systems/demonlord/templates/chat/fortune.hbs'
-  chatData.content = await foundry.applications.handlebars.renderTemplate(template, templateData)  
-  await ChatMessage.create(chatData)
-}
-
-export async function postRestToChat(actor, restTime, magicRecovery, talentRecovery, healing) {
-  const templateData = {
-    actor: actor,
-    data: {},
-  }
-  const data = templateData.data
-  data['actorInfo'] = buildActorInfo(actor)
-  data['restTime'] = restTime
-  data['magicRecovery'] = magicRecovery  
-  data['talentRecovery'] = talentRecovery
-  data['healing'] = healing
-
-  const rollMode = game.settings.get('core', 'rollMode')
-  const chatData = getChatBaseData(actor, rollMode)
-  const template = 'systems/demonlord/templates/chat/rest.hbs'
-  chatData.content = await foundry.applications.handlebars.renderTemplate(template, templateData)
-  await ChatMessage.create(chatData)
-}
-
 export const postItemToChat = (actor, item, attackRoll, target, inputBoons) => {
   const itemData = item.system
   const rollMode = game.settings.get('core', 'rollMode')
@@ -550,7 +462,7 @@ export const postItemToChat = (actor, item, attackRoll, target, inputBoons) => {
   }*/
 
   const targetNumber = itemData?.action?.attack ? actor.getTargetNumber(item) : ''
-  const plus20 = attackRoll?.total >= 20 && (targetNumber ? attackRoll?.total > targetNumber + (game.settings.get('demonlord', 'optionalRuleExceedsByFive') ? 5 : 4) : true)
+  const plus20 = attackRoll?.total >= 20 && attackRoll?.total > targetNumber + 5
 
   let resultText =
     !voidRoll && attackRoll != null && targetNumber !== undefined && attackRoll.total >= parseInt(targetNumber)
@@ -571,8 +483,6 @@ export const postItemToChat = (actor, item, attackRoll, target, inputBoons) => {
 
   let extraDamage = (actor.system.bonuses.attack.damage.weapon ?? '') + (actor.system.bonuses.attack.damage.all ?? '')
   let extraDamage20Plus = (actor.system.bonuses.attack.plus20Damage.weapon ?? '') + (actor.system.bonuses.attack.plus20Damage.all ?? '')
-
-  if (extraDamage.charAt(0).search(/[0-9]/i) === 0) extraDamage = '+' + extraDamage
 
   const templateData = {
     actor,
@@ -631,7 +541,7 @@ export const postItemToChat = (actor, item, attackRoll, target, inputBoons) => {
     chatData.rolls = [attackRoll]
   }
   const template = 'systems/demonlord/templates/chat/useitem.hbs'
-  return foundry.applications.handlebars.renderTemplate(template, templateData).then(content => {
+  return renderTemplate(template, templateData).then(content => {
     chatData.content = content
     if (attackRoll != null) {
       chatData.sound = CONFIG.sounds.dice

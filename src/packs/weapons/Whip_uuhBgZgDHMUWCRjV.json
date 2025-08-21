@@ -8,12 +8,8 @@
   "type": "weapon",
   "data": {
     "description": "",
-    "hands": "off",
+    "hands": "Off",
     "properties": "Finesse, Reach +1",
-    "requirement": {
-      "attribute": "Agility",
-      "minvalue": "11"
-    },
     "availability": "U",
     "value": "5 ss",
     "action": {

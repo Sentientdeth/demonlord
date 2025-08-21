@@ -1,5 +1,4 @@
-const { VisionMode } = foundry.canvas.perception
-const { ColorAdjustmentsSamplerShader } = foundry.canvas.rendering.shaders
+/* globals VisionMode, ColorAdjustmentsSamplerShader  */
 export function registerVisionModes() {
 
   // Shadows as lit

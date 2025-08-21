@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Martel:wght@400;800&family=Roboto:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Shadows Into Light:wght@400;800&family=Shadows Into Light:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English+SC:wght@400;800&display=swap');
+//@import url('https://fonts.googleapis.com/css2?family=IM+Fell+Great+Primer+SC&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
+
+@font-face {
+  font-family: 'Portmanteau';
+  src: url('../fonts/portmanteau-regular-webfont.woff2') format('woff2'),
+    url('../fonts/portmanteau-regular-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Athelas';
+  src: url('../fonts/Athelas.ttc') format('truetype');
+}
+
+@font-face {
+  font-family: 'Linux Libertine Capitals';
+  font-style: normal;
+  font-weight: normal;
+  size-adjust: 150%;
+  src: local('Linux Libertine Capitals'), url('../fonts/LinLibertineC_Re-4.0_.1_.woff') format('woff');
+}
+
+$font-primary: 'Arial', sans-serif;
+$font-secondary: 'Shadows Into Light', sans-serif;
+$font-header: 'IM Fell English SC', serif;
+$font-actor-sheet-inputs: 'Nodesto', 'Signika', 'Palatino Linotype', serif;
+$font-pm: 'Linux Libertine Capitals', 'IM Fell English SC', serif;
+$base-font-size: 12px;
+
+//@font-face {
+//  font-family: 'Gotham Book';
+//  src: url('../fonts/GothamBook Regular.otf') format('opentype');
+//}

@@ -1,26 +1,24 @@
-/* globals fromUuidSync */
 /* -------------------------------------------- */
 /*  Chat methods                                */
 /* -------------------------------------------- */
 
 import {buildActorInfo, formatDice, getChatBaseData} from './base-messages'
 import {TokenManager} from '../pixi/token-manager'
-import {DLAfflictions} from '../active-effects/afflictions'
 import { changesMatch } from '../utils/chat'
 
 const tokenManager = new TokenManager()
 
 export function initChatListeners(html) {
-  $(html).on('click', '.roll-healing', _onChatApplyHealing.bind(this))
-  $(html).on('click', '.roll-damage', _onChatRollDamage.bind(this))
-  $(html).on('click', '.apply-damage', _onChatApplyDamage.bind(this))
-  $(html).on('click', '.apply-effect', _onChatApplyEffect.bind(this))
-  $(html).on('click', '.use-talent', _onChatUseTalent.bind(this))
-  $(html).on('click', '.place-template', _onChatPlaceTemplate.bind(this))
-  $(html).on('click', '.request-challengeroll', _onChatRequestChallengeRoll.bind(this))
-  $(html).on('click', '.make-challengeroll', _onChatMakeChallengeRoll.bind(this))
-  $(html).on('click', '.request-initroll', _onChatRequestInitRoll.bind(this))
-  $(html).on('click', '.make-initroll', _onChatMakeInitRoll.bind(this))
+  html.on('click', '.roll-healing', _onChatApplyHealing.bind(this))
+  html.on('click', '.roll-damage', _onChatRollDamage.bind(this))
+  html.on('click', '.apply-damage', _onChatApplyDamage.bind(this))
+  html.on('click', '.apply-effect', _onChatApplyEffect.bind(this))
+  html.on('click', '.use-talent', _onChatUseTalent.bind(this))
+  html.on('click', '.place-template', _onChatPlaceTemplate.bind(this))
+  html.on('click', '.request-challengeroll', _onChatRequestChallengeRoll.bind(this))
+  html.on('click', '.make-challengeroll', _onChatMakeChallengeRoll.bind(this))
+  html.on('click', '.request-initroll', _onChatRequestInitRoll.bind(this))
+  html.on('click', '.make-initroll', _onChatMakeInitRoll.bind(this))
 }
 
 /* -------------------------------------------- */
@@ -55,94 +53,13 @@ async function _onChatRollDamage(event) {
   event.preventDefault()
   const rollMode = game.settings.get('core', 'rollMode')
   const li = event.currentTarget
-  const actor = _getChatCardActor(li.closest('.demonlord'))
-
-  const appliedEffects = tokenManager.getTokenByActorId(actor.id)?.actor?.appliedEffects
-  
-  if (appliedEffects?.length) {
-    for (let effect of appliedEffects) {
-      const specialDuration = foundry.utils.getProperty(effect, `flags.${game.system.id}.specialDuration`)
-      if (specialDuration === 'NextDamageRoll') await effect?.delete()
-    }
-  }
-
+  const token = li.closest('.demonlord')
+  const actor = _getChatCardActor(token)
   const item = li.children[0]
-  var damageformula = item.dataset.damage
+  const damageformula = item.dataset.damage
   const damagetype = item.dataset.damagetype
   const selected = tokenManager.targets
   const itemId = item.dataset.itemId || li.closest('.demonlord').dataset.itemId
-
-  if (game.settings.get('demonlord', 'optionalRuleConsistentDamage')) {
-    var flattenTree = function(root) {
-      const list = []
-
-      var flattenNode = function (node) {
-        if (node.class !== 'Node') {
-          list.push(node)
-          return
-        }
-
-        const [left, right] = node.operands
-        flattenNode(left)
-        list.push({
-          class: 'OperatorTerm',
-          operator: node.operator,
-          evaluated: false,
-        })
-        flattenNode(right)
-      }
-
-      flattenNode(root)
-      return list
-    }
-
-    let tree = foundry.dice.RollGrammar.parse(damageformula)
-    let rollFlattened = flattenTree(tree)
-    let damageFormulaNew = ''
-    let nrDie
-    let remainder
-    let result
-
-    for (const element of rollFlattened) {
-      switch (element.class) {
-        case 'DiceTerm':
-          switch (element.formula) {
-            case '1d3':
-              damageFormulaNew += '2'
-              break
-            case '2d3':
-              damageFormulaNew += '4'
-              break
-            case '1d6':
-              damageFormulaNew += '3'
-              break
-            case '2d6':
-              damageFormulaNew += '7'
-              break
-            default:
-              nrDie = Array.from(element.formula)[0]
-              remainder = nrDie % 2
-              result = Math.floor(nrDie / 2)
-              for (let i = 0; i < result; i++) {
-                if (i) damageFormulaNew += '+7'
-                else {
-                  damageFormulaNew += '7'
-                }
-              }
-              if (remainder) damageFormulaNew += '+3'
-          }
-          break
-        case 'OperatorTerm':
-          damageFormulaNew += element.operator
-          break
-        case 'NumericTerm':
-          damageFormulaNew += element.number
-          break
-      }
-    }
-
-    damageformula = damageFormulaNew
-  }
 
   const damageRoll = new Roll(damageformula, actor.system)
   await damageRoll.evaluate()
@@ -158,7 +75,6 @@ async function _onChatRollDamage(event) {
 
   var templateData = {
     actor: actor,
-    tokenId: actor.token ? actor.token.uuid : null,
     item: {
       id: itemId,
     },
@@ -178,7 +94,7 @@ async function _onChatRollDamage(event) {
     chatData.rolls = [damageRoll]
   }
   const template = 'systems/demonlord/templates/chat/damage.hbs'
-  foundry.applications.handlebars.renderTemplate(template, templateData).then(content => {
+  renderTemplate(template, templateData).then(content => {
     chatData.content = content
     chatData.sound = CONFIG.sounds.dice
     ChatMessage.create(chatData)
@@ -236,17 +152,6 @@ async function _onChatApplyEffect(event) {
   }
 
   const effectData = activeEffect.toObject()
-  //Repace origin with Item UUID, otherwise effect cannot be removed
-  //specialDuration: TurnStartSource, TurnEndSource
-
-  let aeUuid = activeEffect.uuid
-  let effectOrigin = aeUuid.substr(0, aeUuid.search('.ActiveEffect.'))
-  let effectOriginName = fromUuidSync(effectOrigin).name
-  if (activeEffect.origin.startsWith('Compendium')) {
-    effectData.origin = effectOrigin
-  }
-  if (effectData.name !== effectOriginName)  effectData.name = `${effectData.name} [${effectOriginName}]`  
-  
   for await (const target of selected) {
     // First check if the actor already has this effect
     const matchingEffects = target.actor.effects.filter(e => e.name === effectData.name && changesMatch(e.changes, effectData.changes))
@@ -265,8 +170,8 @@ async function _onChatApplyEffect(event) {
 /* -------------------------------------------- */
 
 async function _onChatUseTalent(event) {
-  const card = event.currentTarget.closest('.demonlord')
-  const actor = _getChatCardActor(card)
+  const token = event.currentTarget.closest('.demonlord')
+  const actor = _getChatCardActor(token)
   if (!actor) return
 
   const div = event.currentTarget.children[0]
@@ -322,7 +227,6 @@ async function _onChatRequestChallengeRoll(event) {
           value: boonsbanestext,
         },
       },
-      tokenId: token.document.uuid,
     }
 
     const chatData = {
@@ -337,7 +241,7 @@ async function _onChatRequestChallengeRoll(event) {
     chatData.whisper = ChatMessage.getWhisperRecipients(actor.name)
 
     const template = 'systems/demonlord/templates/chat/makechallengeroll.hbs'
-    foundry.applications.handlebars.renderTemplate(template, templateData).then(content => {
+    renderTemplate(template, templateData).then(content => {
       chatData.content = content
 
       ChatMessage.create(chatData)
@@ -351,17 +255,15 @@ async function _onChatMakeChallengeRoll(event) {
   event.preventDefault()
   const li = event.currentTarget
   const item = li.children[0]
-  const card = li.closest('.demonlord')
   const attributeName = item.dataset.attribute
   const boonsbanes = item.dataset.boonsbanes
-  const actor = fromUuidSync(card.dataset.tokenId).actor
+  const actorId = item.dataset.actorid
+  const actor = game.actors.get(actorId)
   const attribute = actor.getAttribute(attributeName)
   const start = li.closest('.demonlord')
   const boonsbanesEntered = start.children[1].children[0].children[0].children[1]?.value
 
-  if (!DLAfflictions.isActorBlocked(actor, 'challenge', attributeName)) {
-    await actor.rollAttributeChallenge(attribute, parseInt(boonsbanes) + parseInt(boonsbanesEntered), 0)
-  }
+  await actor.rollAttribute(attribute, parseInt(boonsbanes) + parseInt(boonsbanesEntered), 0)
 }
 
 /* -------------------------------------------- */
@@ -395,7 +297,7 @@ async function _onChatRequestInitRoll(event) {
     chatData.whisper = ChatMessage.getWhisperRecipients(actor.name)
 
     const template = 'systems/demonlord/templates/chat/makeinitroll.hbs'
-    foundry.applications.handlebars.renderTemplate(template, templateData).then(async content => {
+    renderTemplate(template, templateData).then(async content => {
       chatData.content = content
       await ChatMessage.create(chatData)
     })
@@ -433,12 +335,15 @@ async function _onChatMakeInitRoll(event) {
  */
 function _getChatCardActor(card) {
   // Case 1 - a synthetic actor from a Token
-  const tokenUuid = card.dataset.tokenId
-  if (tokenUuid) {
-    let actor = fromUuidSync(tokenUuid).actor
-    if (actor) return actor
-    else
-    return null
+  const tokenKey = card.dataset.tokenId
+  if (tokenKey) {
+    const [sceneId, tokenId] = tokenKey.split('.')
+    const scene = game.scenes.get(sceneId)
+    if (!scene) return null
+    const tokenData = scene.items.get(tokenId)
+    if (!tokenData) return null
+    const token = new Token(tokenData)
+    return token.actor
   }
 
   // Case 2 - use Actor ID directory

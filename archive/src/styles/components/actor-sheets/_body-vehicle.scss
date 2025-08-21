@@ -1,0 +1,146 @@
+.vehicle {
+  .header {
+    height: 20px;
+    line-height: 20px;
+    background: #000;
+    color: #fff;
+    font-size: 12px;
+    margin-bottom: 1px;
+
+    .charname {
+      float: left;
+      padding-left: 5px;
+
+      input {
+        float: left;
+        width: 170px;
+        height: 15px;
+        margin-top: 2px;
+        color: #fff;
+      }
+    }
+  }
+
+  .left {
+    float: left;
+    width: 353px;
+    margin-right: 20px;
+
+    .body {
+      float: left;
+      width: 100%;
+      margin-top: 5px;
+
+      .grid {
+        margin: 0 0 2px 0;
+      }
+    }
+  }
+
+  .right {
+    float: left;
+    width: 130px;
+    padding-top: 8px;
+
+    .edit {
+      width: 130px;
+      font-size: 11px;
+    }
+
+    img {
+      height: auto;
+      border: 0;
+    }
+  }
+
+  .actions {
+    float: left;
+    width: 100%;
+
+    .header {
+      float: none;
+      background: #a7a9ac;
+      border-bottom: 0;
+      line-height: 20px;
+      padding-left: 5px;
+      color: #000;
+
+      .itemname {
+        float: left;
+        font-size: 12px;
+      }
+
+      .item-controls {
+        float: right;
+        margin-right: 5px;
+      }
+
+      input {
+        width: 30px;
+        height: 13px;
+        margin: 0 0 0 2px;
+        text-align: center;
+      }
+    }
+
+    .description {
+      font-size: 12px;
+    }
+
+    .body {
+      margin: 5px 0 10px 0;
+      padding: 0;
+      font-size: 11px;
+      list-style: none;
+
+      .item {
+        margin: 0 0 10px 0;
+        padding: 0;
+        height: auto;
+        overflow-y: auto;
+
+        .itemname {
+          float: left;
+          height: 14px;
+          font-weight: bold;
+
+          input {
+            width: 150px;
+            height: 13px;
+            margin: 0 0 0 2px;
+          }
+        }
+
+        .item-controls {
+          float: right;
+          width: 25px;
+          margin-right: 5px;
+        }
+
+        .spellcastings,
+        .spelltype,
+        .bonesbanes {
+          float: left;
+          padding-left: 5px;
+        }
+      }
+
+      .spell {
+        margin: 0 0 0 10px;
+      }
+    }
+  }
+}
+
+.items-list {
+  margin: 5px 10px 20px 0;
+
+  .feature {
+    font-size: 12px;
+  }
+}
+
+.turnmode {
+  margin-top: 5px;
+  margin-left: 30px;
+}

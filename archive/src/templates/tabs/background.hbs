@@ -1,0 +1,14 @@
+<div style="
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 4px;
+    height: 100%;
+">
+  <div class="dl-text-header-upper dl-underline-red dl-item-row-header">
+    <div class="col-12">{{localize "DL.BackgroundTitle"}}</div>
+  </div>
+  <div class="dl-editor-box">
+    {{editor system.enrichedDescription target="system.description" button=true owner=owner editable=editable
+             engine="prosemirror"}}
+  </div>
+</div>

@@ -38,7 +38,7 @@ export class DLStatEditor extends HandlebarsApplicationMixin(ApplicationV2) {
  * @protected
  */
   async _prepareContext(options) { // eslint-disable-line no-unused-vars
-    return this.item.system.levels[0][this.statType][this.statName]
+    return this.ancestry.system[this.statType][this.statName]
   }
 
    /**
@@ -50,21 +50,20 @@ export class DLStatEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {Promise<void>}
    */
   static async onSubmit(event, form, formData) {
-    const levels = this.item.system.levels
-    
-    levels.find(l => l.level === '0')[this.statType][this.statName] = {
-      value: formData.object.value,
-      formula: formData.object.formula,
-      immune: formData.object.immune
-    };
-
-    await this.item.update({
+    console.log(this.ancestry)
+    await this.ancestry.update({
       system: {
-        levels: levels
+        [this.statType]: {
+          [this.statName]: {
+            value: formData.object.value,
+            formula: formData.object.formula,
+            immune: formData.object.immune
+          }
+        }
       }
     })
 
-    this.item.sheet.render(true)
+    this.ancestry.sheet.render(true)
   }
 
   /**
@@ -75,15 +74,23 @@ export class DLStatEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   static async rollStat(event, target) { // eslint-disable-line no-unused-vars
     const divTarget = document.getElementById('stat-editor-roll-target')
     const formula = document.getElementById('stat-editor-roll-formula').value
-    const roll = new Roll(formula, this.item.system)
+    const roll = new Roll(formula, this.ancestry.system)
     await roll.evaluate()
     divTarget.value = roll.total
   }
 
   constructor(object, options) {
     super(options)
-    this.item = object.item
+    this.ancestry = object.ancestry
     this.statType = object.statType
     this.statName = object.statName
   }
+
+  // /**
+  //  * Construct and return the data object used to render the HTML template for this form application.
+  //  * @return {Object}
+  //  */
+  // getData() {
+  //   return this.ancestry.system[this.statType][this.statName]
+  // }
 }

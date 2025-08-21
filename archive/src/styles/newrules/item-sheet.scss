@@ -1,0 +1,314 @@
+@import '../utils/colors';
+@import '../utils/typography';
+@import 'typography';
+@import 'generic-components';
+
+.dl-item-form {
+  .tab {
+    padding: 16px;
+  }
+
+  input,
+  select,
+  input[type='number'] {
+    display: inline-block;
+    width: fit-content;
+    height: fit-content;
+    min-height: 16px;
+    resize: none;
+
+    &:empty {
+      max-height: 28px;
+    }
+
+    padding: 0;
+  }
+
+  input[type='number'] {
+    width: 24px;
+  }
+
+  .dl-item-section-header {
+    font-family: $font-pm !important;
+    font-size: $f-size-big !important;
+    font-weight: bold !important;
+    padding: 0 16px;
+
+    &.flex {
+      display: flex;
+      align-content: center;
+      justify-content: flex-end;
+      align-items: center;
+      & > div:first-child {
+        margin-right: auto;
+      }
+    }
+
+    &.center {
+      text-align: center;
+    }
+
+    div.uses {
+      height: 19px;
+      margin-left: 8px;
+
+      & > input[type='number'] {
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        text-align: center !important;
+      }
+    }
+
+    input,
+    select,
+    input[type='number'] {
+      @extend .dl-input-grey;
+      font-family: $font-pm !important;
+      font-size: $f-size-big !important;
+      font-weight: bold !important;
+      color: var(--color-text-dark-primary);
+      text-align: center;
+    }
+
+    select {
+      appearance: none;
+      cursor: pointer;
+      margin-top: 0;
+    }
+  }
+
+  hr {
+    @include hr-gray;
+  }
+
+  .dl-item-section-section {
+    &.margin > div {
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+
+    &.left > div {
+      justify-content: flex-start;
+    }
+
+    &.text-areas {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    &.text-areas > div > b {
+      min-width: 100px;
+      align-self: flex-start;
+    }
+
+    font-family: $font-primary !important;
+    padding: 4px 16px;
+    font-size: $f-size-big-slight !important;
+    line-height: 1.4;
+
+    & > div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      & > div:last-child:not(.attribute) {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
+
+    &.dl-column-flex {
+      flex-direction: row;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+
+      & > div {
+        flex-direction: column;
+        width: 100%;
+
+        b {
+          align-self: center;
+          margin-bottom: 4px;
+        }
+      }
+    }
+
+    & > div.dl-column-flex {
+      flex-direction: row;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+
+      .dl-new-project-2 .sep {
+        border-left: 1px solid #0000001a !important;
+        height: 16px !important;
+      }
+
+      .dl-new-project-2,
+      .dl-new-project-2:last-child {
+        gap: 0 !important;
+      }
+    }
+
+    & > div.dl-column-grid {
+      display: grid;
+      align-content: space-around;
+      justify-content: space-around;
+      align-items: center;
+      justify-items: center;
+
+      &.column-3 {
+        grid-template-columns: auto auto auto;
+      }
+    }
+
+    .dl-item-damage-container {
+      flex-direction: column;
+      align-items: flex-end !important;
+
+      & > div {
+        display: flex;
+        gap: 4px;
+      }
+
+      a {
+        width: 16px;
+        text-align: center;
+      }
+    }
+
+    input,
+    select,
+    input[type='number'],
+    textarea {
+      font-family: $font-primary !important;
+      font-size: $f-size-big-slight !important;
+      font-weight: normal;
+      background: none;
+      border: none;
+      color: var(--color-text-dark-primary);
+      text-align: left;
+    }
+
+    select {
+      appearance: none;
+      cursor: pointer;
+      margin-top: 0;
+      margin-left: 4px;
+    }
+
+    textarea {
+      //display: block;
+      resize: none;
+      min-height: 20px;
+      overflow: hidden;
+      box-shadow: none;
+      padding: 0 4px;
+      width: auto;
+      flex-grow: 1;
+
+      &:first-letter {
+        text-transform: capitalize;
+      }
+    }
+
+    &.dl-characteristics-container .dl-new-project-2 {
+      margin-top: 2px;
+      margin-bottom: 2px;
+
+      & > span:not(:empty) {
+        width: 64px;
+        text-align: center;
+        text-overflow: ellipsis;
+        max-height: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      & > input {
+        max-width: 16px;
+      }
+    }
+  }
+
+  .dl-item-section-description {
+    & > div > b {
+      display: inline-block;
+      font-family: $font-primary;
+      font-weight: bolder;
+      margin-bottom: 4px;
+    }
+
+    margin: 4px 0;
+    padding: 0 16px;
+    font-family: $font-primary;
+    font-size: $f-size-big-slight;
+  }
+
+  .dl-item-section-contents {
+    & > div > b {
+      display: inline-block;
+      font-family: $font-primary;
+      font-weight: bolder;
+      margin-bottom: 4px;
+    }
+
+    & > .dl-item-row-header {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-gap: 16px;
+    }
+
+    margin: 4px 0;
+    padding: 0 16px;
+    font-family: $font-primary;
+    font-size: $f-size-big-slight;
+  }
+
+  a.create-nested-item {
+    margin-right: 7px;
+  }
+
+  .dl-path-container {
+    height: 100%;
+    min-height: 300px;
+    display: flex;
+    //background: aliceblue;
+    font-family: $font-primary;
+
+    .dl-path-sidebar {
+      width: 120px;
+      border-right: 2px solid #33333333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 16px;
+      font-size: $f-size-big;
+      font-weight: bold;
+
+      & > div:first-child {
+        margin-bottom: 16px;
+      }
+
+      & > *:not(:first-child) {
+        margin-bottom: 4px;
+        //font-family: 'Poison Hope', serif;
+        font-size: 15px;
+      }
+    }
+
+    .dl-path-content {
+      width: 100%;
+      padding: 8px;
+
+      .dl-new-project-2 {
+        margin: 2px;
+      }
+    }
+  }
+}

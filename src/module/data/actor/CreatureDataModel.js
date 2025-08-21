@@ -10,11 +10,6 @@ import {
   makeHtmlField
 } from '../helpers.js'
 
-import {
-  getRanges,
-  getCanFly
-} from '../../utils/token-ruler.js'
-
 export default class CreatureDataModel extends foundry.abstract.DataModel {
   static defineSchema() {
     const type = 'creature'
@@ -32,26 +27,11 @@ export default class CreatureDataModel extends foundry.abstract.DataModel {
       perceptionsenses: makeStringField(),
       speedtraits: makeStringField(),
       armor: makeStringField(),
-      wealth: new foundry.data.fields.SchemaField({
-        edit: makeBoolField(),
-        bits: makeIntField(),
-        cp: makeIntField(),
-        ss: makeIntField(),
-        gc: makeIntField()
-      }),      
       roles: new foundry.data.fields.ArrayField(makeStringField()) // ?
     }
   }
 
   get type() {
     return 'creature'
-  }
-  
-  get ranges() {
-    return getRanges(this)
-  }
-
-  get canFly() {
-    return getCanFly(this)
   }
 }

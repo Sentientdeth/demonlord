@@ -4,7 +4,7 @@
  * @return {Promise}
  */
 export const preloadHandlebarsTemplates = async function () {
-  return foundry.applications.handlebars.loadTemplates([
+  return loadTemplates([
     'systems/demonlord/templates/tabs/activeeffects.hbs',
     'systems/demonlord/templates/tabs/afflictions.hbs',
     'systems/demonlord/templates/tabs/background.hbs',
@@ -30,12 +30,10 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/demonlord/templates/chat/makechallengeroll.hbs',
     'systems/demonlord/templates/chat/makeinitroll.hbs',
     'systems/demonlord/templates/chat/rest.hbs',
-    'systems/demonlord/templates/chat/fortune.hbs',    
     'systems/demonlord/templates/chat/showtalent.hbs',
     'systems/demonlord/templates/chat/spell.hbs',
     'systems/demonlord/templates/chat/talent.hbs',
     'systems/demonlord/templates/chat/useitem.hbs',
-    'systems/demonlord/templates/chat/formulaeroll.hbs',
     'systems/demonlord/templates/actor/actor-sheet.hbs',
     'systems/demonlord/templates/actor/limited-sheet.hbs',
     'systems/demonlord/templates/actor/sidemenu.hbs',
@@ -44,57 +42,30 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/demonlord/templates/actor/limited-header.hbs',
     'systems/demonlord/templates/dialogs/choose-turn-dialog.hbs',
     'systems/demonlord/templates/dialogs/endofround-dialog.hbs',
-
-    // Actor sheets
     'systems/demonlord/templates/actor/creature-sheet.hbs',
     'systems/demonlord/templates/actor/creature-header.hbs',
     'systems/demonlord/templates/actor/creature-sidemenu.hbs',
     'systems/demonlord/templates/actor/vehicle-sheet.hbs',
     'systems/demonlord/templates/actor/vehicle-header.hbs',
     'systems/demonlord/templates/actor/vehicle-sidemenu.hbs',
-
-    // General templates
-    'systems/demonlord/templates/generic/tab-navigation.hbs',
-    "systems/demonlord/templates/item/parts/AE-config-details.hbs",
-    "systems/demonlord/templates/item/parts/AE-config-duration.hbs",
-    "systems/demonlord/templates/item/parts/AE-config-changes.hbs",
+    'systems/demonlord/templates/item/active-effect-config.hbs',
 
     // Item Sheet Partials
     'systems/demonlord/templates/item/partial/item-activation.hbs',
     'systems/demonlord/templates/item/partial/item-contents.hbs',
+    'systems/demonlord/templates/item/partial/item-description.hbs',
+    'systems/demonlord/templates/item/partial/item-effects.hbs',
+    'systems/demonlord/templates/item/partial/item-sheet-header.hbs',
     'systems/demonlord/templates/item/partial/item-attacks.hbs',
     'systems/demonlord/templates/item/partial/item-challenge.hbs',
     'systems/demonlord/templates/item/partial/item-healing.hbs',
     'systems/demonlord/templates/item/partial/item-measured-template.hbs',
-    'systems/demonlord/templates/item/partial/item-availability.hbs',
-    'systems/demonlord/templates/item/partial/item-description.hbs',
-    
-    // Item Sheets
-    'systems/demonlord/templates/item/parts/item-sheet-header.hbs',
-    'systems/demonlord/templates/item/parts/item-description.hbs',
-    'systems/demonlord/templates/item/parts/item-effects.hbs',
-    'systems/demonlord/templates/item/item-ancestry-sheet.hbs',
     'systems/demonlord/templates/item/item-ancestry-edit.hbs',
-    'systems/demonlord/templates/item/item-ancestry-view.hbs',  
-    'systems/demonlord/templates/item/item-ammo-sheet.hbs',
-    'systems/demonlord/templates/item/item-armor-sheet.hbs',
-    'systems/demonlord/templates/item/item-role-sheet.hbs',
-    'systems/demonlord/templates/item/item-endoftheround-sheet.hbs',
-    'systems/demonlord/templates/item/item-feature-sheet.hbs',
-    'systems/demonlord/templates/item/item-item-sheet.hbs',
-    'systems/demonlord/templates/item/item-language-sheet.hbs',
-    'systems/demonlord/templates/item/item-path-sheet.hbs',
+    'systems/demonlord/templates/item/item-ancestry-view.hbs',
     'systems/demonlord/templates/item/item-path-edit.hbs',
     'systems/demonlord/templates/item/item-path-view.hbs',
-    'systems/demonlord/templates/item/item-profession-sheet.hbs',
-    'systems/demonlord/templates/item/item-relic-sheet.hbs',
-    'systems/demonlord/templates/item/item-role-sheet.hbs',
     'systems/demonlord/templates/item/item-role-edit.hbs',
     'systems/demonlord/templates/item/item-role-view.hbs',
-    'systems/demonlord/templates/item/item-specialaction-sheet.hbs',
-    'systems/demonlord/templates/item/item-spell-sheet.hbs',
-    'systems/demonlord/templates/item/item-talent-sheet.hbs',
-    'systems/demonlord/templates/item/item-weapon-sheet.hbs',
 
     // Chat Partials
     'systems/demonlord/templates/chat/partial/chat-challenge.hbs',
@@ -103,6 +74,5 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/demonlord/templates/chat/partial/chat-measured-template.hbs',
     'systems/demonlord/templates/chat/partial/chat-effects.hbs',
     'systems/demonlord/templates/chat/partial/chat-description.hbs',
-    "systems/demonlord/templates/chat/partial/chat-extra-effects.hbs",
   ])
 }

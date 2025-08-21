@@ -31,10 +31,10 @@ export function buildActorInfo(actor) {
     const ancestry = actor.items.find(i => i.type === 'ancestry')?.name || ''
     const pathsData = actor.items.filter(i => i.type === 'path').map(p => p.system)
     const path =
-      pathsData.find(p => p.type === 'novice')?.parent.name ||
-      pathsData.find(p => p.type === 'expert')?.parent.name ||
-      pathsData.find(p => p.type === 'master')?.parent.name ||
-      pathsData.find(p => p.type === 'legendary')?.parent.name ||
+      pathsData.find(p => p.type === 'novice')?.name ||
+      pathsData.find(p => p.type === 'expert')?.name ||
+      pathsData.find(p => p.type === 'master')?.name ||
+      pathsData.find(p => p.type === 'legendary')?.name ||
       ''
     info = ancestry + (path ? ', ' + path : '')
   } else {
@@ -55,9 +55,8 @@ export function formatDice(diceRoll) {
   if (diceRoll != null) {
     let pushDice = (_diceData, total, faces, color) => {
       let img = null
-      if ([3, 4, 6, 8, 10, 12, 20].indexOf(faces) > -1) {
+      if ([4, 6, 8, 10, 12, 20].indexOf(faces) > -1) {
         img = `../icons/svg/d${faces}-grey.svg`
-        if (faces === 3) img = `../icons/svg/d6-grey.svg`
       }
       _diceData.dice.push({
         img: img,
@@ -77,7 +76,7 @@ export function formatDice(diceRoll) {
             pushDice(diceData, pooldie.result, faces, '#777')
           } else {
             let color = 'white'
-            if (((diceRoll._formula.includes('d6kh') || diceRoll._formula.includes('d6r1kh')) && faces === 6) || ((diceRoll._formula.includes('d3kh') || diceRoll._formula.includes('d3r1kh')) && faces === 3)) {
+            if (diceRoll._formula.includes('d6kh') && faces === 6) {
               let operator = diceRoll.terms[diceRoll.terms.length - 2].operator
               if (operator === '+') color = '#006400'
               if (operator === '-') color = '#a22223'

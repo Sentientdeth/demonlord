@@ -8,9 +8,9 @@ export const multiplyEffect = (key, value, priority) => ({
   priority: priority
 })
 
-export const addEffect = (key, value, priority, noPlusify=false) => ({
+export const addEffect = (key, value, priority) => ({
   key: key,
-  value: noPlusify ? value : (value ? plusify(value) : 0),
+  value: plusify(value),
   mode: CONST.ACTIVE_EFFECT_MODES.ADD,
   priority: priority
 })
@@ -27,9 +27,9 @@ export const concatString = (key, value, separator = '') => ({
   mode: CONST.ACTIVE_EFFECT_MODES.ADD,
 })
 
-export const overrideEffect = (key, value, priority, noParse=false) => ({
+export const overrideEffect = (key, value, priority) => ({
   key: key,
-  value: noParse ? value : parseInt(value),
+  value: parseInt(value),
   mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
   priority: priority
 })
@@ -107,7 +107,7 @@ export class DLActiveEffects {
       const effectsToDel = []
 
       for (const effectData of effectDataList) {
-        const u = currentEffects.find(ce => ce.flags?.demonlord?.slug === effectData?.flags?.demonlord?.slug)
+        const u = currentEffects.find(ce => ce.flags?.slug === effectData?.flags?.slug)
         if (u) {
           effectData._id = u._id
           if (effectData.changes.length > 0) effectsToUpd.push(effectData)
@@ -126,93 +126,74 @@ export class DLActiveEffects {
 
   static generateEffectDataFromAncestry(item, actor = null) {
     const priority = 1
-    const ancestryData = item.system
+    const dataL0 = item.system
 
-    const effectDataList = []
+    const effectDataL0 = {
+      name: `${item.name} (${game.i18n.localize('DL.CharLevel')} 0)`,
+      icon: item.img,
+      origin: item.uuid,
+      disabled: false,
+      transfer: false,
+      duration: { startTime: 0 },
+      flags: {
+        sourceType: 'ancestry',
+        levelRequired: 0,
+        notDeletable: true,
+        notEditable: true,
+        notToggleable: true,
+        permanent: true,
+        slug: `ancestry-${item.name.toLowerCase()}-L0`,
+      },
+      changes: [
+        addEffect('system.attributes.strength.value', dataL0.attributes.strength.value - 10, priority),
+        addEffect('system.attributes.agility.value', dataL0.attributes.agility.value - 10, priority),
+        addEffect('system.attributes.intellect.value', dataL0.attributes.intellect.value - 10, priority),
+        addEffect('system.attributes.will.value', dataL0.attributes.will.value - 10, priority),
+        addEffect('system.attributes.perception.value', dataL0.characteristics.perceptionmodifier, priority),
+        addEffect('system.attributes.strength.immune', dataL0.attributes.strength.immune, priority),
+        addEffect('system.attributes.agility.immune', dataL0.attributes.agility.immune, priority),
+        addEffect('system.attributes.intellect.immune', dataL0.attributes.intellect.immune, priority),
+        addEffect('system.attributes.will.immune', dataL0.attributes.will.immune, priority),
 
-    ancestryData.levels.forEach(ancestryLevel => {
-      const levelEffectData = {
-        name: `${item.name} (${game.i18n.localize('DL.CharLevel')} ${ancestryLevel.level})`,
-        icon: item.img,
-        origin: item.uuid,
-        disabled: actor.system.level < ancestryLevel.level,
-        transfer: false,
-        duration: { startTime: 0 },
-        flags: {
-          demonlord: {
-            sourceType: 'ancestry',
-            levelRequired: parseInt(ancestryLevel.level),
-            permanent: true,
-            notDeletable: true,
-            notEditable: true,
-            notToggleable: true,
-            slug: `ancestry-${item.name.toLowerCase()}-L${ancestryLevel.level}`,
-          }
+        //addEffect('system.characteristics.insanity.value', dataL0.characteristics.insanity.value, priority),
+        //addEffect('system.characteristics.corruption.value', dataL0.characteristics.corruption.value, priority),
+        addEffect('system.characteristics.insanity.immune', dataL0.characteristics.insanity.immune, priority),
+        addEffect('system.characteristics.corruption.immune', dataL0.characteristics.corruption.immune, priority),
+        addEffect('system.characteristics.defense', dataL0.characteristics.defensemodifier, priority),
+        addEffect('system.characteristics.health.max', dataL0.characteristics.healthmodifier, priority),
+        addEffect('system.characteristics.health.healingrate', dataL0.characteristics.healingratemodifier, priority),
+        addEffect('system.characteristics.power', dataL0.characteristics.power, priority),
+        addEffect('system.characteristics.speed', dataL0.characteristics.speed - 10, priority),
+        {
+          key: 'system.characteristics.size',
+          value: dataL0.characteristics.size,
+          mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+          priority: priority,
         },
-        changes: [
-          // Characteristics
-          addEffect('system.characteristics.health.max', ancestryLevel.characteristics.health, priority),
-          addEffect('system.characteristics.health.healingrate', ancestryLevel.characteristics.healingRate, priority),
-          overrideEffect('system.characteristics.size', ancestryLevel.characteristics.size, priority, true),
-          addEffect('system.characteristics.power', ancestryLevel.characteristics.power, priority),
-          addEffect('system.attributes.perception.value', ancestryLevel.characteristics.perception, priority),
+        // overrideEffect('system.characteristics.size', dataL0.characteristics.size, priority)
+      ].filter(falsyChangeFilter),
+    }
 
-          (ancestryLevel.level === '0' ?
-            overrideEffect('system.characteristics.speed', ancestryLevel.characteristics.speed, priority)
-          : addEffect('system.characteristics.speed', ancestryLevel.characteristics.speed, priority)),
-          addEffect('system.characteristics.defense', ancestryLevel.characteristics.defense, priority),
-          addEffect('system.characteristics.insanity.immune', ancestryLevel.characteristics.insanity.immune, priority),
-          addEffect('system.characteristics.corruption.immune', ancestryLevel.characteristics.corruption.immune, priority),
-
-          // FIXME
-          //addEffect('system.characteristics.insanity.value', ancestryLevel.characteristics.insanity.value, priority),
-          //addEffect('system.characteristics.corruption.value', ancestryLevel.characteristics.corruption.value, priority),
-
-          // Starting attributes or selected checkbox (select two, three, fixed)
-          (ancestryLevel.level === '0' ? [
-            addEffect('system.attributes.strength.value', ancestryLevel.attributes.strength.value - 10, priority),
-            addEffect('system.attributes.strength.immune', ancestryLevel.attributes.strength.immune, priority),
-          ] : addEffect('system.attributes.strength.value', ancestryLevel.attributes.strength.value * (ancestryLevel.attributes.strength.selected || ancestryLevel.attributeSelectIsFixed), priority)),
-
-          (ancestryLevel.level === '0' ? [
-            addEffect('system.attributes.agility.value', ancestryLevel.attributes.agility.value - 10, priority),
-            addEffect('system.attributes.agility.immune', ancestryLevel.attributes.agility.immune, priority),
-          ] : addEffect('system.attributes.agility.value', ancestryLevel.attributes.agility.value * (ancestryLevel.attributes.agility.selected || ancestryLevel.attributeSelectIsFixed), priority)),
-
-          (ancestryLevel.level === '0' ? [
-            addEffect('system.attributes.intellect.value', ancestryLevel.attributes.intellect.value - 10, priority),
-            addEffect('system.attributes.intellect.immune', ancestryLevel.attributes.intellect.immune, priority),
-          ] : addEffect('system.attributes.intellect.value', ancestryLevel.attributes.intellect.value * (ancestryLevel.attributes.intellect.selected || ancestryLevel.attributeSelectIsFixed), priority)),
-
-          (ancestryLevel.level === '0' ? [
-            addEffect('system.attributes.will.value', ancestryLevel.attributes.will.value - 10, priority),
-            addEffect('system.attributes.will.immune', ancestryLevel.attributes.will.immune, priority),
-          ] : addEffect('system.attributes.will.value', ancestryLevel.attributes.will.value * (ancestryLevel.attributes.will.selected || ancestryLevel.attributeSelectIsFixed), priority
-          )),
-        ].flat().filter(falsyChangeFilter),
-      }
-
-      // Two set attributes
-      if (ancestryLevel.attributeSelectIsTwoSet) {
-        const attributeOne = ancestryLevel.attributeSelectTwoSetSelectedValue1
-          ? ancestryLevel.attributeSelectTwoSet1
-          : ancestryLevel.attributeSelectTwoSet2
-        const attributeTwo = ancestryLevel.attributeSelectTwoSetSelectedValue2
-          ? ancestryLevel.attributeSelectTwoSet3
-          : ancestryLevel.attributeSelectTwoSet4
-
-        levelEffectData.changes = levelEffectData.changes.concat(
-          [
-            addEffect(`system.attributes.${attributeOne}.value`, ancestryLevel.attributeSelectTwoSetValue1, priority),
-            addEffect(`system.attributes.${attributeTwo}.value`, ancestryLevel.attributeSelectTwoSetValue2, priority),
-          ].filter(falsyChangeFilter),
-        )
-      }
-
-      effectDataList.push(levelEffectData)
-    })
-
-    return effectDataList
+    const dataL4 = item.system.level4
+    const effectDataL4 = {
+      name: `${item.name} (${game.i18n.localize('DL.CharLevel')} 4)`,
+      icon: item.img,
+      origin: item.uuid,
+      disabled: actor.system.level < 4,
+      transfer: false,
+      duration: { startTime: 0 },
+      flags: {
+        sourceType: 'ancestry',
+        levelRequired: 4,
+        permanent: true,
+        notDeletable: true,
+        notEditable: true,
+        notToggleable: true,
+        slug: `ancestry-${item.name.toLowerCase()}-L4`,
+      },
+      changes: [addEffect('system.characteristics.health.max', dataL4.healthbonus, priority)].filter(falsyChangeFilter),
+    }
+    return [effectDataL0, effectDataL4]
   }
 
   /* -------------------------------------------- */
@@ -231,47 +212,45 @@ export class DLActiveEffects {
         transfer: false,
         duration: { startTime: 0 },
         flags: {
-          demonlord: {
-            sourceType: 'path',
-            levelRequired: parseInt(pathLevel.level),
-            permanent: true,
-            notDeletable: true,
-            notEditable: true,
-            notToggleable: true,
-            slug: `path-${item.name.toLowerCase()}-L${pathLevel.level}`,
-          }
+          sourceType: 'path',
+          levelRequired: parseInt(pathLevel.level),
+          permanent: true,
+          notDeletable: true,
+          notEditable: true,
+          notToggleable: true,
+          slug: `path-${item.name.toLowerCase()}-L${pathLevel.level}`,
         },
         changes: [
           // Characteristics
-          addEffect('system.characteristics.health.max', pathLevel.characteristics.health, priority),
-          addEffect('system.characteristics.power', pathLevel.characteristics.power, priority),
-          addEffect('system.attributes.perception.value', pathLevel.characteristics.perception, priority),
-          addEffect('system.characteristics.speed', pathLevel.characteristics.speed, priority),
-          addEffect('system.characteristics.defense', pathLevel.characteristics.defense, priority),
+          addEffect('system.characteristics.health.max', pathLevel.characteristicsHealth, priority),
+          addEffect('system.characteristics.power', pathLevel.characteristicsPower, priority),
+          addEffect('system.attributes.perception.value', pathLevel.characteristicsPerception, priority),
+          addEffect('system.characteristics.speed', pathLevel.characteristicsSpeed, priority),
+          addEffect('system.characteristics.defense', pathLevel.characteristicsDefense, priority),
 
           // FIXME
-          // addEffect('system.characteristics.insanity.value', pathLevel.characteristics.insanity.value, priority),
-          // addEffect('system.characteristics.corruption.value', pathLevel.characteristics.corruption.value, priority),
+          // addEffect('system.characteristics.insanityModifier', pathLevel.characteristicsInsanity, priority),
+          // addEffect('system.characteristics.corruptionModifier', pathLevel.characteristicsCorruption, priority),
 
           // Selected checkbox (select two, three, fixed)
           addEffect(
             'system.attributes.strength.value',
-            pathLevel.attributes.strength.value * (pathLevel.attributes.strength.selected || pathLevel.attributeSelectIsFixed),
+            pathLevel.attributeStrength * (pathLevel.attributeStrengthSelected || pathLevel.attributeSelectIsFixed),
             priority
           ),
           addEffect(
             'system.attributes.agility.value',
-            pathLevel.attributes.agility.value * (pathLevel.attributes.agility.selected || pathLevel.attributeSelectIsFixed),
+            pathLevel.attributeAgility * (pathLevel.attributeAgilitySelected || pathLevel.attributeSelectIsFixed),
             priority
           ),
           addEffect(
             'system.attributes.intellect.value',
-            pathLevel.attributes.intellect.value * (pathLevel.attributes.intellect.selected || pathLevel.attributeSelectIsFixed),
+            pathLevel.attributeIntellect * (pathLevel.attributeIntellectSelected || pathLevel.attributeSelectIsFixed),
             priority
           ),
           addEffect(
             'system.attributes.will.value',
-            pathLevel.attributes.will.value * (pathLevel.attributes.will.selected || pathLevel.attributeSelectIsFixed),
+            pathLevel.attributeWill * (pathLevel.attributeWillSelected || pathLevel.attributeSelectIsFixed),
             priority
           ),
         ].filter(falsyChangeFilter),
@@ -314,40 +293,35 @@ export class DLActiveEffects {
       transfer: false,
       duration: { startTime: 0 },
       flags: {
-        demonlord: {
-          sourceType: 'creaturerole',
-          levelRequired: 0,
-          notDeletable: true,
-          notEditable: true,
-          notToggleable: true,
-          permanent: true,
-          slug: `role-${item.name.toLowerCase()}`,
-        }
+        sourceType: 'creaturerole',
+        levelRequired: 0,
+        notDeletable: true,
+        notEditable: true,
+        notToggleable: true,
+        permanent: true,
+        slug: `role-${item.name.toLowerCase()}`,
       },
       changes: [
         addEffect('system.attributes.strength.value', data.attributes.strength, priority),
-        addEffect('system.attributes.strength.immune', data.attributes.strength.immune, priority, true),
+        addEffect('system.attributes.strength.immune', data.attributes.strengthImmune, priority),
         addEffect('system.attributes.agility.value', data.attributes.agility, priority),
-        addEffect('system.attributes.agility.immune', data.attributes.agility.immune, priority, true),
+        addEffect('system.attributes.agility.immune', data.attributes.agilityImmune, priority),
         addEffect('system.attributes.intellect.value', data.attributes.intellect, priority),
-        addEffect('system.attributes.intellect.immune', data.attributes.intellect.immune, priority, true),
+        addEffect('system.attributes.intellect.immune', data.attributes.intellectImmune, priority),
         addEffect('system.attributes.will.value', data.attributes.will, priority),
-        addEffect('system.attributes.will.immune', data.attributes.will.immune, priority, true),
-        addEffect('system.attributes.perception.value', data.characteristics.perception, priority),
-        addEffect('system.characteristics.defense', data.characteristics.defense, priority),
-        addEffect('system.characteristics.health.max', data.characteristics.health, priority),
-        addEffect('system.characteristics.health.healingrate', data.characteristics.healingRate, priority),
+        addEffect('system.attributes.will.immune', data.attributes.willImmune, priority),
+        addEffect('system.attributes.perception.value', data.characteristics.perceptionmodifier, priority),
+        addEffect('system.characteristics.defense', data.characteristics.defensemodifier, priority),
+        addEffect('system.characteristics.health.max', data.characteristics.healthmodifier, priority),
+        addEffect('system.characteristics.health.healingrate', data.characteristics.healingratemodifier, priority),
         addEffect('system.characteristics.power', data.characteristics.power, priority),
         addEffect('system.characteristics.speed', data.characteristics.speed, priority),
-
-        // FIXME
-        // addEffect('system.characteristics.corruption.value', data.characteristics.corruption.value, priority),
-        // addEffect('system.characteristics.insanity.value', data.characteristics.insanity.value, priority),
-        
+        addEffect('system.characteristics.corruption', data.characteristics.corruption, priority),
+        addEffect('system.characteristics.insanity', data.characteristics.insanity, priority),
         addEffect('system.difficulty', data.difficulty, priority),
         overrideEffect('system.characteristics.size', data.characteristics.size, priority),
-        overrideEffect('system.frightening', data.frightening, priority, true),
-        overrideEffect('system.horrifying', data.horrifying, priority, true),
+        overrideEffect('system.frightening', data.frightening ? 1 : 0, priority),
+        overrideEffect('system.horrifying', data.horrifying ? 1 : 0, priority),
       ].filter(falsyChangeFilter),
     }
 
@@ -367,15 +341,13 @@ export class DLActiveEffects {
       transfer: false,
       duration: { startTime: 0, rounds: 1 * !!talentData.uses.max },
       flags: {
-        demonlord: {
-          sourceType: 'talent',
-          // levelRequired: parseInt(pathLevelItem.level), TODO
-          permanent: false,
-          notDeletable: true,
-          notEditable: true,
-          notToggleable: false,
-          slug: `talent-${item.name.toLowerCase()}`,
-        }
+        sourceType: 'talent',
+        // levelRequired: parseInt(pathLevelItem.level), TODO
+        permanent: false,
+        notDeletable: true,
+        notEditable: true,
+        notToggleable: false,
+        slug: `talent-${item.name.toLowerCase()}`,
       },
       changes: [
         // Bonuses - Characteristics
@@ -394,7 +366,7 @@ export class DLActiveEffects {
       addEffect('system.bonuses.attack.boons.will', action.extraboonsbanes * action.willboonsbanesselect, priority),
       concatDiceEffect('system.bonuses.attack.damage', action.extradamage),
       concatDiceEffect('system.bonuses.attack.plus20Damage', action.extraplus20damage),
-      concatString('system.bonuses.attack.extraEffect', talentData.extraeffect, '\n'),
+      concatString('system.bonuses.attack.extraEffect', action.extraeffect, '\n'),
     ].filter(falsyChangeFilter)
 
     if (attackChanges.length > 0) effectData.changes = effectData.changes.concat(attackChanges)
@@ -427,15 +399,13 @@ export class DLActiveEffects {
       disabled: !armorData.wear,
       duration: { startTime: 0 },
       flags: {
-        demonlord: {
-          sourceType: 'armor',
-          //levelRequired: 0,
-          permanent: false,
-          notDeletable: true,
-          notEditable: true,
-          notToggleable: true,
-          slug: `armor-${item.name.toLowerCase()}`,
-        }
+        sourceType: 'armor',
+        //levelRequired: 0,
+        permanent: false,
+        notDeletable: true,
+        notEditable: true,
+        notToggleable: true,
+        slug: `armor-${item.name.toLowerCase()}`,
       },
       changes: [
         addEffect('system.bonuses.armor.agility', armorData.agility, priority),
@@ -443,7 +413,6 @@ export class DLActiveEffects {
         upgradeEffect('system.bonuses.armor.fixed', armorData.fixed, priority),
       ].filter(falsyChangeFilter),
     }
-
     return [effectData]
   }
 
@@ -457,8 +426,8 @@ export class DLActiveEffects {
     const notMetEffectsData = actor.effects
       .filter(
         effect =>
-          (effect.flags?.demonlord?.levelRequired > actor.system.level && !effect.disabled) ||
-          (effect.flags?.demonlord?.levelRequired <= actor.system.level && effect.disabled),
+          (effect.flags?.levelRequired > actor.system.level && !effect.disabled) ||
+          (effect.flags?.levelRequired <= actor.system.level && effect.disabled),
       )
       .map(effect => ({
         _id: effect._id,
@@ -490,15 +459,13 @@ export class DLActiveEffects {
       transfer: false,
       duration: { startTime: 0 },
       flags: {
-        demonlord: {
-          sourceItemsLength: itemNames.length,
-          sourceType: 'encumbrance',
-          permanent: true,
-          notDeletable: true,
-          notEditable: true,
-          notToggleable: false,
-          slug: `encumbrance-${effectName.toLowerCase()}`,
-        }
+        sourceItemsLength: itemNames.length,
+        sourceType: 'encumbrance',
+        permanent: true,
+        notDeletable: true,
+        notEditable: true,
+        notToggleable: false,
+        slug: `encumbrance-${effectName.toLowerCase()}`,
       },
       changes: [
         addEffect('system.bonuses.attack.boons.strength', n, priority),

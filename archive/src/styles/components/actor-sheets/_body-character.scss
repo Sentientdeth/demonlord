@@ -1,0 +1,498 @@
+.features {
+  .items-list {
+    margin-right: 0;
+  }
+
+  .item-controls {
+    margin-top: -14px;
+  }
+
+  .feature {
+    .item-controls {
+      margin-top: 0;
+    }
+  }
+}
+
+.items-list {
+  list-style: none;
+  padding: 0;
+  margin: 5px 10px 20px 0;
+
+  .item-list {
+    list-style: none;
+    margin: 0 0 20px 0;
+    padding: 0;
+  }
+
+  .items-header {
+    border-bottom: 1px solid var(--demonlord-red);
+    font-weight: bold;
+    font-family: $font-header;
+    text-transform: uppercase;
+    height: 16px;
+    margin: 2px 0;
+    padding: 0;
+    align-items: center;
+
+    > * {
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .item-name {
+      flex: 2;
+      font-size: 10px;
+    }
+
+    .effect-controls {
+      text-align: right;
+      flex: 0 0 60px;
+      justify-content: space-between;
+    }
+
+    .effect-name {
+      font-size: 11px;
+    }
+  }
+
+  .itemamount {
+    float: right;
+    margin-right: 15px;
+  }
+
+  .itemvalue {
+    float: right;
+    margin-right: 15px;
+  }
+
+  .itemline {
+    margin-right: 15px;
+  }
+
+  .item {
+    padding: 3px 0;
+    border-bottom: 1px solid #333;
+    font-size: 12px;
+    overflow-y: auto;
+
+    .item-image {
+      float: left;
+      margin-right: 5px;
+      width: 30px;
+    }
+
+    img {
+      display: block;
+    }
+
+    .weaponname {
+      float: left;
+      width: 255px;
+      margin-right: 10px;
+    }
+
+    .damage {
+      float: left;
+      width: 65px;
+      margin-right: 10px;
+    }
+
+    .defense {
+      float: left;
+      width: 300px;
+      margin-right: 10px;
+    }
+
+    .ammo-amount {
+      width: 50px;
+    }
+
+    .properties {
+      float: left;
+      width: 350px;
+    }
+
+    .tradition {
+      .traditiontitle {
+        float: left;
+      }
+
+      .traditionname {
+        float: left;
+        margin-left: 5px;
+        width: 200px;
+
+        input {
+          width: 180px;
+        }
+
+        .tradition-edit {
+          float: left;
+          width: 200px;
+          font-weight: bold;
+        }
+
+        .tradition-focus {
+          float: left;
+          width: 200px;
+        }
+      }
+    }
+
+    .itemname {
+      float: left;
+      width: 140px;
+      margin-right: 10px;
+    }
+
+    .itemtitle {
+      float: left;
+      margin-right: 15px;
+    }
+
+    .item-inv {
+      float: right;
+      width: 50px;
+      height: 16px;
+    }
+
+    .item-name {
+      color: #000;
+      flex: 2;
+
+      .item-image {
+        flex: 0 0 30px;
+        height: 30px;
+        background-size: 30px;
+        border: none;
+        margin-right: 5px;
+      }
+
+      .item-image-small {
+        flex: 0 0 15px;
+        height: 15px;
+        background-size: 15px;
+        border: none;
+        margin-right: 5px;
+      }
+
+      h4 {
+        margin: 0;
+        white-space: nowrap;
+        overflow-x: hidden;
+      }
+    }
+
+    .effect-source,
+    .effect-duration,
+    .effect-controls {
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .effect-source {
+      text-transform: capitalize;
+    }
+
+    .effect-controls {
+      border: none;
+      flex: 0 0 60px;
+      justify-content: space-between;
+
+      .effect-control {
+        margin: 0;
+        height: 14px;
+      }
+    }
+  }
+
+  .feature {
+    font-size: 11px;
+    margin-top: 10px;
+
+    .item-controls {
+      float: right;
+    }
+  }
+
+  .spell {
+    .spellname {
+      float: left;
+      width: 225px;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .spelltype {
+      float: left;
+      width: 50px;
+    }
+
+    .spellcastings {
+      float: left;
+      width: 50px;
+    }
+
+    .spellinfo {
+      float: left;
+      margin-top: 10px;
+    }
+
+    .toggleInfo {
+      float: left;
+      width: 400px;
+    }
+  }
+
+  .item-align {
+    width: 100%;
+  }
+
+  .item-name {
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+
+    input {
+      width: 200px;
+    }
+  }
+
+  .item-controls {
+    flex: 0 0 40px;
+    text-align: right;
+    font-size: 12px;
+
+    .item-control {
+      padding-left: 1px;
+    }
+
+    .item-wearoff {
+      color: #999;
+    }
+
+    .itemred {
+      color: var(--demonlord-red);
+    }
+  }
+
+  .talent {
+    .talentheader {
+      float: left;
+      width: 335px;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .talenttype {
+      float: left;
+      width: 50px;
+    }
+
+    .talent-uses {
+      float: left;
+      width: 50px;
+    }
+
+    .spellinfo {
+      float: left;
+      margin-top: 10px;
+    }
+
+    .toggleTalentInfo {
+      float: left;
+      width: 400px;
+    }
+
+    .toggleItemInfo {
+      float: left;
+      width: 400px;
+    }
+  }
+}
+
+.colright .items-list {
+  margin-top: 0;
+}
+
+.isPC {
+  float: right;
+}
+
+.togglegm {
+  position: absolute;
+  right: 7px;
+  top: 52px;
+}
+
+.switch,
+.switchBig,
+.switchTurn {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 12px;
+}
+
+.switchBig {
+  width: 55px;
+  height: 14px;
+}
+
+.switchTurn {
+  width: 130px;
+  height: 14px;
+}
+
+.switch input,
+.switchBig input,
+.switchTurn input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #333;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.switchBig .slider {
+  background-color: transparent;
+  box-shadow: 0 0 0 1px #000, 0 0 0 2px #a22223, 0 0 0 3px #000, inset 0 0 0 rgb(0 0 0 / 50%), 0 0 5px #a22223;
+}
+
+.switchTurn .slider {
+  background: none;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 8px;
+  width: 8px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.switchBig .slider:before {
+  height: 10px;
+  width: 10px;
+}
+
+.switchTurn .slider:before {
+  height: 10px;
+  width: 10px;
+}
+
+.switchTurn input:checked + .slider {
+  background: none;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(36px);
+  -ms-transform: translateX(36px);
+  transform: translateX(36px);
+}
+
+.switchBig input:checked + .slider:before {
+  -webkit-transform: translateX(41px);
+  -ms-transform: translateX(41px);
+  transform: translateX(41px);
+}
+
+.switchTurn input:checked + .slider:before {
+  -webkit-transform: translateX(116px);
+  -ms-transform: translateX(116px);
+  transform: translateX(116px);
+  background-color: white;
+}
+
+.on {
+  display: none;
+}
+
+.on,
+.off {
+  color: white;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  font-size: 9px;
+  font-family: Verdana, sans-serif;
+}
+
+.offGrey
+ {
+  color: grey;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  font-size: 9px;
+  font-family: Verdana, sans-serif;
+}
+
+.switchBig .on,
+.switchBig .off {
+  font-size: 10px;
+}
+
+.switchTurn .on,
+.switchTurn .offGrey,
+.switchTurn .off {
+  text-align: center;
+  width: 130px;
+}
+
+input:checked + .slider .on {
+  display: block;
+}
+
+input:checked + .slider .offGrey {
+  display: none;
+}
+
+
+input:checked + .slider .off {
+  display: none;
+}
+
+.slider.round {
+  border-radius: 16px;
+}
+
+.switchTurn .slider.roundGrey {
+  border-radius: 34px;
+  border: none;
+  box-shadow: 0 0 0 1px #000, 0 0 0 2px #a22223, 0 0 0 3px #000, inset 0 0 8px rgba(0, 0, 0, 0.5), 0 0 8px #a22223;
+}
+
+.switchTurn .slider.round {
+  border-radius: 34px;
+  border: none;
+  box-shadow: 0 0 0 1px #000, 0 0 0 2px #a22223, 0 0 0 3px #000, inset 0 0 8px rgba(0, 0, 0, 0.5), 0 0 8px #a22223;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.slider.roundGrey:before {
+  background-color: grey;
+  border-radius: 50%;
+}

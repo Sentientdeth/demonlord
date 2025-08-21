@@ -6,7 +6,6 @@ import {DemonlordItem} from './item/item.js'
 import {ActionTemplate} from './pixi/action-template.js'
 import {registerSettings} from './settings.js'
 import {registerVisionModes} from './vision.js'
-import KeyState from './utils/key-state.js'
 import {DLCombatTracker} from './combat/combat-tracker.js'
 import {preloadHandlebarsTemplates} from './templates.js'
 import * as migrations from './migration.js'
@@ -19,8 +18,10 @@ import {DLActiveEffectConfig} from './active-effects/sheets/active-effect-config
 import DLCharacterSheet from './actor/sheets/character-sheet'
 import DLCreatureSheet from './actor/sheets/creature-sheet'
 import DLVehicleSheet from './actor/sheets/vehicle-sheet'
-import DLBaseItemSheet from './item/sheets/base-item-sheet.js'
-
+import DLBaseItemSheet from './item/sheets/base-item-sheet'
+import DLAncestrySheet from './item/sheets/ancestry-sheet'
+import DLRoleSheet from './item/sheets/role-sheet.js'
+import DLPathSheet from './item/sheets/path-sheet'
 import CharacterDataModel from './data/actor/CharacterDataModel.js'
 import CreatureDataModel from './data/actor/CreatureDataModel.js'
 import VehicleDataModel from './data/actor/VehicleDataModel.js'
@@ -45,11 +46,6 @@ import 'tippy.js/dist/tippy.css';
 import {registerHandlebarsHelpers} from "./utils/handlebars-helpers";
 import DLBaseActorSheet from "./actor/sheets/base-actor-sheet";
 import {_onUpdateWorldTime, DLCombat} from "./combat/combat"; // optional for styling
-import { activateSocketListener } from "./utils/socket.js"
-import TokenRulerDemonLord from "./utils/token-ruler.js"
-
-const { Actors, Items } = foundry.documents.collections //eslint-disable-line no-shadow
-const { ActorSheet, ItemSheet } = foundry.appv1.sheets //eslint-disable-line no-shadow
 
 
 Hooks.once('init', async function () {
@@ -78,7 +74,7 @@ Hooks.once('init', async function () {
   CONFIG.Actor.documentClass = DemonlordActor
   CONFIG.Token.objectClass = DemonlordToken
   CONFIG.Item.documentClass = DemonlordItem
-  foundry.applications.apps.DocumentSheetConfig.registerSheet(ActiveEffect, "demonlord", DLActiveEffectConfig, {makeDefault: true})
+  DocumentSheetConfig.registerSheet(ActiveEffect, "demonlord", DLActiveEffectConfig, {makeDefault: true})
   CONFIG.ui.combat = DLCombatTracker
   CONFIG.Combat.documentClass = DLCombat
   CONFIG.time.roundTime = 10
@@ -132,22 +128,31 @@ Hooks.once('init', async function () {
   Items.unregisterSheet('core', ItemSheet)
   Items.registerSheet('demonlord', DLBaseItemSheet, {
     types: [
-      'ancestry',
-      'ammo',
-      'armor',
-      'creaturerole',
-      'endoftheround',
-      'feature',
       'item',
-      'language',
-      'path',
-      'profession',
-      'relic',
-      'specialaction',
+      'feature',
       'spell',
       'talent',
-      'weapon'
+      'weapon',
+      'armor',
+      'ammo',
+      'relic',
+      'specialaction',
+      'endoftheround',
+      'profession',
+      'language',
     ],
+    makeDefault: true,
+  })
+  Items.registerSheet('demonlord', DLAncestrySheet, {
+    types: ['ancestry'],
+    makeDefault: true,
+  })
+  Items.registerSheet('demonlord', DLPathSheet, {
+    types: ['path'],
+    makeDefault: true,
+  })
+  Items.registerSheet('demonlord', DLRoleSheet, {
+    types: ['creaturerole'],
     makeDefault: true
   })
 
@@ -158,38 +163,13 @@ Hooks.once('init', async function () {
   if (typeof Babele !== 'undefined') {
     Babele.get().setSystemTranslationsDir('packs/translations')
   }
-  activateSocketListener()
-
-  // Token Ruler
-  if (game.settings.get('demonlord', 'integrateTokenRuler')) {
-    delete CONFIG.Token.movement.actions.blink
-    delete CONFIG.Token.movement.actions.jump
-    delete CONFIG.Token.movement.actions.burrow
-    delete CONFIG.Token.movement.actions.climb.getCostFunction
-    delete CONFIG.Token.movement.actions.crawl.getCostFunction
-    delete CONFIG.Token.movement.actions.fly.getCostFunction
-    delete CONFIG.Token.movement.actions.swim.getCostFunction
-    CONFIG.Token.movement.actions.fly.canSelect = token => token?.actor?.system.canFly
-    CONFIG.Token.rulerClass = TokenRulerDemonLord
-  }
 })
 
 Hooks.once('ready', async function () {
-  // If the turn marker is not set, use ours as a themed fallback
-  const combatConfig = game.settings.get('core', 'combatTrackerConfig')
-  if (!combatConfig.turnMarker.src) {
-    combatConfig.turnMarker.src = 'systems/demonlord/assets/ui/turn-marker.png'
-    combatConfig.turnMarker.animation = 'spin'
-    game.settings.set('core', 'combatTrackerConfig', combatConfig)
-  }
-
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on('hotbarDrop', (bar, data, slot) => macros.createDemonlordMacro(data, slot))
   // Migration
   await handleMigrations()
-
-  game.demonlord.KeyState = new KeyState()
-
 })
 
 /**
@@ -230,7 +210,6 @@ Hooks.once('setup', function () {
 
   // Set active effect keys-labels
   DLActiveEffectConfig.initializeChangeKeys()
-  DLActiveEffectConfig.initializeSpecialDurations()
 })
 
 /**
@@ -262,19 +241,10 @@ Hooks.on('createToken', async _tokenDocument => {
 })
 
 Hooks.on('updateActor', async (actor, updateData) => {
-  if (!actor.isOwner || !game.combat) return
-
-  let token = actor.token || game.combats?.viewed?.combatants.find(c => c.actor?.id == actor.id)?.token
-  let combatant = token?.combatant
-  let defeated = (actor?.system.characteristics.health.value >= actor?.system.characteristics.health.max) ? true : false
-
-     if (combatant != undefined && combatant.defeated != defeated && game.settings.get('demonlord', 'autoSetDefeated')) {
-         await combatant.update({ defeated: defeated })
-     }
-
+  if (!actor.isOwner) return
   // Update the combat initiative if the actor has changed its turn speed
   const isUpdateTurn = typeof updateData?.system?.fastturn !== 'undefined' && updateData?.system?.fastturn !== null
-  if (!(isUpdateTurn && (game.user.isGM || actor.isOwner))) return
+  if (!(isUpdateTurn && (game.user.isGM || actor.isOwner) && game.combat)) return
   const linkedCombatants = game.combat.combatants.filter(c => c.actorId === actor.id)
   for await (const c of linkedCombatants) {
     game.combat.setInitiative(c.id, game.combat.getInitiativeValue(c))
@@ -282,7 +252,7 @@ Hooks.on('updateActor', async (actor, updateData) => {
 })
 
 export async function findAddEffect(actor, effectId, overlay) {
-  if (!actor.effects.find(e => e.statuses?.has(effectId)) && !actor.isImmuneToAffliction(effectId)) {
+  if (!actor.effects.find(e => e.statuses?.has(effectId))) {
     const effect = CONFIG.statusEffects.find(e => e.id === effectId)
     if (!effect) {
       ui.notifications.error(game.i18n.localize('DL.UnknownEffect') + ': ' + effectId)
@@ -314,9 +284,6 @@ Hooks.on('createActiveEffect', async (activeEffect, _, userId) => {
   const _parent = activeEffect?.parent
   if (statuses?.size > 0 && _parent) {
     for await (const statusId of statuses) {
-      // Skip immunities
-      if (_parent.isImmuneToAffliction(statusId)) continue
-
       await _parent.setFlag('demonlord', statusId, true)
       
       // If asleep, also add prone and uncoscious
@@ -344,10 +311,8 @@ Hooks.on('createActiveEffect', async (activeEffect, _, userId) => {
   const changes = activeEffect.changes
   if (['character', 'creature'].includes(_parent.type)) {
     for (const affliction of changes.filter(c => c.key === 'system.maluses.affliction')) {
-      if (!_parent.isImmuneToAffliction(affliction.value.toLowerCase())) {
-        await _parent.setFlag('demonlord', affliction.value.toLowerCase(), true)
-        await findAddEffect(_parent, affliction.value.toLowerCase())
-      }
+      await _parent.setFlag('demonlord', affliction.value.toLowerCase(), true)
+      await findAddEffect(_parent, affliction.value.toLowerCase())
     }
   }
 })
@@ -356,16 +321,6 @@ export async function findDeleteEffect(actor, effectId) {
   const effect = actor.effects.find(e => e.statuses?.has(effectId))
   return await effect?.delete()
 }
-
- Hooks.on('preUpdateActiveEffect', async (activeEffect, changes, _, userId ) => {
-    // Set specialDuration effects to temporary
-    if (game.user.id !== userId) return
-    const specialDuration = foundry.utils.getProperty(changes, `flags.${game.system.id}.specialDuration`)
-    if (specialDuration !== "None" && specialDuration !== undefined)
-    {
-      changes.duration.rounds = 1
-    }
-})
 
 Hooks.on('deleteActiveEffect', async (activeEffect, _, userId) => {
   if (game.user.id !== userId) return
@@ -410,7 +365,7 @@ Hooks.on('updateActiveEffect', async (activeEffect, diff, _, userId) => {
     // If it's an affliction (system.maluses.affliction), add it
     if (['character', 'creature'].includes(_parent.type)) {
       for (const affliction of changes.filter(c => c.key === 'system.maluses.affliction')) {
-        if (diff.disabled || _parent.isImmuneToAffliction(affliction.value.toLowerCase())) {
+        if (diff.disabled) {
           await _parent.setFlag('demonlord', affliction.value.toLowerCase(), false)
           await findDeleteEffect(_parent, affliction.value.toLowerCase())
         } else {
@@ -426,14 +381,11 @@ Hooks.on("updateWorldTime", _onUpdateWorldTime)
 
 Hooks.on('renderChatLog', (app, html, _data) => initChatListeners(html))
 
-Hooks.on('renderChatMessageHTML', async (app, html, _msg) => {
+Hooks.on('renderChatMessage', async (app, html, _msg) => {
   if (!game.user.isGM) {
-    html.querySelectorAll('.gmonly').forEach(el => el.remove())
-    html.querySelectorAll('.gmonlyzero').forEach(el => el.remove())
-    let messageActor = app.speaker.actor
-    if (!game.actors.get(messageActor)?.isOwner && game.settings.get('demonlord', 'hideActorInfo')) html.find('.showlessinfo').remove()
-    if (!game.actors.get(messageActor)?.isOwner && game.settings.get('demonlord', 'hideDescription')) html.find('.showdescription').empty()
-  } else html.querySelectorAll('.gmremove').forEach(el => el.remove())
+    html.find('.gmonly').remove()
+    html.find('.gmonlyzero').remove()
+  } else html.find('.gmremove').remove()
 })
 
 Hooks.once('diceSoNiceReady', dice3d => {
@@ -469,13 +421,6 @@ Hooks.once('diceSoNiceReady', dice3d => {
     ],
     system: 'demonlord',
   })
-  if (game.settings.get('demonlord', 'replaced3')) {
-    dice3d.addDicePreset({
-      type: 'd3',
-      labels: ['I', 'II', 'systems/demonlord/assets/ui/icons/logo.png'],
-      system: 'demonlord',
-    })
-  }  
   dice3d.addColorset({
     name: 'demonlord',
     description: 'Special',
@@ -567,4 +512,5 @@ Hooks.on('DL.Action', async () => {
   if (actionTemplates.length > 0) await canvas.scene.deleteEmbeddedDocuments('MeasuredTemplate', actionTemplates)
 })
 
+Hooks.on('renderDLBaseItemSheet', (app, html, data) => DLBaseItemSheet.onRenderInner(app, html, data))
 Hooks.on('renderDLBaseActorSheet', (app, html, data) => DLBaseActorSheet.onRenderInner(app, html, data))

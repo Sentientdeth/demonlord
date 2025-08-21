@@ -11,11 +11,9 @@ const _buildBaseAffliction = (label, icon, changes = [], flags = {}) => ({
   transfer: true,
   duration: {},
   flags: {
-    demonlord: {
-      sourceType: 'affliction',
-      permanent: false,
-      ...flags,
-    }
+    sourceType: 'affliction',
+    permanent: false,
+    ...flags,
   },
   changes: changes,
   description: game.i18n.localize('DL.Afflictions' + capitalize(label))
@@ -34,8 +32,8 @@ export class DLAfflictions {
     const isBlocked = actor.system.maluses.autoFail[actionType]?.[actionAttribute] > 0
     if (isBlocked) {
       // TODO: more precise message? Currently it picks the first message
-      let msg = Array.from(actor.allApplicableEffects()).find(effect => Boolean(effect.flags?.demonlord?.warningMessage))
-        ?.flags.demonlord?.warningMessage
+      let msg = Array.from(actor.allApplicableEffects()).find(effect => Boolean(effect.flags?.warningMessage))
+        ?.flags.warningMessage
       msg = msg ?? game.i18n.localize(`DL.AutoFail${actionType.capitalize()}s`)
       ui.notifications.error(msg)
     }
@@ -292,18 +290,6 @@ export class DLAfflictions {
         },
       ),
     )
-
-    // Surrounded
-    effectsDataList.push(
-      _buildBaseAffliction(
-        'surrounded',
-        'systems/demonlord/assets/icons/effects/surrounded.svg',
-        [
-          addEffect('system.bonuses.defense.boons.weapon', -1, effectPriority),
-          addEffect('system.bonuses.defense.boons.spell', -1, effectPriority),
-        ],
-      ),
-    )    
 
     // Unconscious
     effectsDataList.push(

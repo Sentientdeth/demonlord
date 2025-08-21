@@ -42,32 +42,31 @@ export default class DLCharacterSheet extends DLBaseActorSheet {
 
     // Effects categories
     data.ancestryEffects = prepareActiveEffectCategories(
-      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.demonlord?.sourceType === 'ancestry'),
+      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.sourceType === 'ancestry'),
     )
     delete data.ancestryEffects.temporary
 
     data.pathEffects = prepareActiveEffectCategories(
-      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.demonlord?.sourceType === 'path'),
+      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.sourceType === 'path'),
     )
     delete data.pathEffects.temporary
 
     data.talentEffects = prepareActiveEffectCategories(
-      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.demonlord?.sourceType === 'talent'),
+      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.sourceType === 'talent'),
     )
     data.spellEffects = prepareActiveEffectCategories(
-      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.demonlord?.sourceType === 'spell'),
+      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.sourceType === 'spell'),
     )
     data.itemEffects = prepareActiveEffectCategories(
-      Array.from(this.actor.allApplicableEffects()).filter(effect => ['armor', 'weapon', 'item'].indexOf(effect.flags?.demonlord?.sourceType) >= 0),
+      Array.from(this.actor.allApplicableEffects()).filter(effect => ['armor', 'weapon', 'item'].indexOf(effect.flags?.sourceType) >= 0),
     )
     data.itemEffects = prepareActiveEffectCategories(
-      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.demonlord?.sourceType === 'creaturerole'),
+      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.sourceType === 'creaturerole'),
     )
     data.itemEffects = prepareActiveEffectCategories(
-      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.demonlord?.sourceType === 'relic'),
+      Array.from(this.actor.allApplicableEffects()).filter(effect => effect.flags?.sourceType === 'relic'),
     )
     this.prepareItems(data)
-    data['fortuneAwardPrevented']  = (game.settings.get('demonlord', 'fortuneAwardPrevented') && !game.user.isGM && !this.actor.system.characteristics.fortune) ? true : false
     return data
   }
 
@@ -121,10 +120,10 @@ export default class DLCharacterSheet extends DLBaseActorSheet {
     if (item.type === 'ancestry') {
 
       // Add insanity and corruption values
-      const insanityImmune = this.actor.system.characteristics.insanity.immune || item.system.levels.filter(l => l.characteristics.insanity.immune).length > 0
-      const corruptionImmune = this.actor.system.characteristics.corruption.immune || item.system.levels.filter(l => l.characteristics.corruption.immune).length > 0
-      const newInsanity = this.actor.system.characteristics.insanity.value + item.system.levels.reduce((s, l) => s + l.characteristics.insanity.value, 0)
-      const newCorruption = this.actor.system.characteristics.corruption.value + item.system.levels.reduce((s, l) => s + l.characteristics.corruption.value, 0)
+      const insanityImmune = this.actor.system.characteristics.insanity.immune || item.system.characteristics.insanity.immune
+      const corruptionImmune = this.actor.system.characteristics.corruption.immune || item.system.characteristics.corruption.immune
+      const newInsanity = this.actor.system.characteristics.insanity.value + item.system.characteristics.insanity.value
+      const newCorruption = this.actor.system.characteristics.corruption.value + item.system.characteristics.corruption.value
 
       await this.actor.update({
         'system.characteristics': {
@@ -262,17 +261,6 @@ export default class DLCharacterSheet extends DLBaseActorSheet {
       }
       await this.actor.update({ 'system.characteristics.corruption.value': value }).then(_ => this.render())
     })
-
-    // Fortune click
-      // eslint-disable-line no-unused-vars
-      html.on('mousedown', '.fortune', async () => {
-      // Expending fortune always possible.
-      if (game.settings.get('demonlord', 'fortuneAwardPrevented') && !game.user.isGM && !this.actor.system.characteristics.fortune) return
-      let value = parseInt(this.actor.system.characteristics.fortune)
-      if (value) await this.actor.expendFortune(false)
-      else this.actor.expendFortune(true)
-    })
-
 
     // Health bar fill
     const healthbar = html.find('.healthbar-fill')

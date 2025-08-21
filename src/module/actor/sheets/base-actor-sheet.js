@@ -1,13 +1,13 @@
 import {onManageActiveEffect, prepareActiveEffectCategories} from '../../active-effects/effects'
 import {buildOverview} from '../../chat/effect-messages'
-import {capitalize} from '../../utils/utils'
+import {capitalize, enrichHTMLUnrolled} from '../../utils/utils'
 import {DemonlordItem} from '../../item/item'
 import {DLAfflictions} from '../../active-effects/afflictions'
-import { buildDropdownList } from '../../utils/handlebars-helpers'
+import {initDlEditor} from "../../utils/editor";
+import DLBaseItemSheet from "../../item/sheets/base-item-sheet";
 import tippy from "tippy.js";
 
-const { TextEditor } = foundry.applications.ux //eslint-disable-line no-shadow
-export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
+export default class DLBaseActorSheet extends ActorSheet {
   /* -------------------------------------------- */
   /*  Data preparation                            */
 
@@ -32,13 +32,10 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
       generalEffects: prepareActiveEffectCategories(Array.from(this.actor.allApplicableEffects()), true),
       effectsOverview: buildOverview(this.actor),
       flags: this.actor.flags,
-      addCreatureInventoryTab: game.settings.get('demonlord', 'addCreatureInventoryTab'),
-      hideTurnMode: game.settings.get('demonlord', 'optionalRuleInitiativeMode') === 's' ? false : true,
-      hideFortune: game.settings.get('demonlord', 'fortuneHide') ? true : false
     }
 
     // Enrich HTML
-    data.system.enrichedDescription = await TextEditor.implementation.enrichHTML(this.actor.system.description, {async: true});
+    data.system.enrichedDescription = await TextEditor.enrichHTML(this.actor.system.description, {async: true});
 
     // Attributes checkbox
     for (const attr of Object.entries(data.system.attributes)) {
@@ -49,7 +46,7 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     const m = new Map()
     for await (const item of this.actor.items) {
       const type = item.type
-      item.system.enrichedDescription =  await TextEditor.implementation.enrichHTML(item.system.description, { unrolled: true })
+      item.system.enrichedDescription =  await enrichHTMLUnrolled(item.system.description)
       m.has(type) ? m.get(type).push(item) : m.set(type, [item])
     }
     data._itemsByType = m
@@ -98,13 +95,13 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   /* -------------------------------------------- */
   /*  Drop item event                             */
+
   /* -------------------------------------------- */
 
   /** @override */
   async _onDropItemCreate(itemData) {
     const isAllowed = await this.checkDroppedItem(itemData)
     if (isAllowed) {
-      await this.preDropItemCreate(itemData)
       const createdItems = await super._onDropItemCreate(itemData)
       await this.postDropItemCreate(createdItems[0])
     } else {
@@ -113,10 +110,6 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   async checkDroppedItem(_itemData) {
-    return true
-  }
-
-  async preDropItemCreate(_itemData) {
     return true
   }
 
@@ -194,56 +187,7 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
   /* -------------------------------------------- */
 
   static onRenderInner(app, html, data) {
-    const autoresize = (el) => {
-      const jEl = $(el)
-      if (jEl.prop("tagName") === 'INPUT') {
-        const setSize = () => {
-          let size = Math.max(1, (el.value?.length || el.placeholder?.length))
-          let ff = jEl.css('font-family')
-          if (ff.includes('Libertine')) {
-            el.style.width = (size + 4)+ 'ch'
-          } else {
-            el.size = size
-          }
-        }
-        setSize()
-        el.oninput = setSize
-      } else if (jEl.prop("tagName") === 'TEXTAREA') {
-        const getHeight = () => Math.max(0, el?.scrollHeight)
-        jEl.height(0)
-        jEl.height(getHeight() + 'px')
-        el.oninput = () => {
-          jEl.height(0)
-          jEl.height(getHeight() + 'px')
-        }
-      }
-    }
-
-    html.find('[autosize]').each((_, el) => autoresize(el))
-
-    // Icons tooltip
-    tippy('[data-tippy-content]')
-    tippy('[data-tippy-html]', {
-      content(reference) {
-        return $(reference).data('tippyHtml')
-      },
-      allowHTML: true
-    })
-    tippy('.dl-new-project-2.dropdown', {
-      content(reference) {
-        html = buildDropdownList(reference.attributes.name.value, reference.attributes.value.value, data)
-        return html
-      },
-      allowHTML: true,
-      interactive: true,
-      trigger: 'click',
-      placement: 'bottom',
-      arrow: false,
-      offset: [0, 0],
-      theme: 'demonlord-dropdown',
-      animation: 'shift-away',
-    })
-    
+    DLBaseItemSheet.onRenderInner(app, html, data)  // Call onRenderInner of base item sheet, since it's the same
     tippy('[data-tab="afflictions"] [data-tippy-affliction]', {
       content(reference) {
         return $(reference).data('tippyAffliction')
@@ -280,10 +224,6 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
       const checked = input.checked
       const afflictionId = $(ev.currentTarget).data('name')
       if (checked) {
-        if (this.actor.isImmuneToAffliction(afflictionId)) {
-          ui.notifications.warn(game.i18n.localize('DL.DialogWarningActorImmune'));
-          return false;
-        }
         const affliction = CONFIG.statusEffects.find(a => a.id === afflictionId)
         if (!affliction) return false
         affliction['statuses'] = [affliction.id]
@@ -358,7 +298,7 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         item.system.wear &&
         item.system.requirement?.minvalue != '' &&
         item.system.requirement?.attribute != '' && 
-        +item.system.requirement?.minvalue > (+this.actor.getAttribute(item.system.requirement?.attribute)?.value + +this.actor.getAttribute(item.system.requirement?.attribute)?.requirementModifier)
+        +item.system.requirement?.minvalue > +this.actor.getAttribute(item.system.requirement?.attribute)?.value
       ) {
         $(el).addClass('dl-text-red')
       }
@@ -390,14 +330,7 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
       const div = $(ev.currentTarget)
       const attributeName = div.data('key')
       const attribute = this.actor.getAttribute(attributeName)
-      if (!attribute.immune) {
-        // Make an attribute attack if a target is selected, otherwise, challenge roll
-        if (game.user.targets?.ids.length && !(event.ctrlKey || event.metaKey)) {
-          this.actor.rollAttack(attribute)
-        } else {
-          this.actor.rollChallenge(attribute)
-        }
-      }
+      if (!attribute.immune) this.actor.rollChallenge(attribute)
     })
 
     // Set immune on rollable attribute
@@ -462,5 +395,8 @@ export default class DLBaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         li.addEventListener('dragstart', handler, false)
       })
     }
+
+    // Custom editor
+    initDlEditor(html, this)
   }
 }

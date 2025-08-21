@@ -8,7 +8,7 @@
   "type": "weapon",
   "data": {
     "description": "",
-    "hands": "one",
+    "hands": "One",
     "properties": "Finesse, Thrown, Range (short)",
     "requirement": {
       "attribute": "Strength",

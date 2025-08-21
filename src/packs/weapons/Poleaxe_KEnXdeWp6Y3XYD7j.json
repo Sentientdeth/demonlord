@@ -7,7 +7,7 @@
   "type": "weapon",
   "data": {
     "description": "",
-    "hands": "two",
+    "hands": "Two",
     "properties": "Reach +1",
     "requirement": {
       "attribute": "Strength",

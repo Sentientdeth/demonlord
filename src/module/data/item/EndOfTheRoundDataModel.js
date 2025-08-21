@@ -5,10 +5,9 @@ import {
   makeHtmlField,
 } from '../helpers.js'
 
-export default class EndOfTheRoundDataModel extends foundry.abstract.TypeDataModel {
+export default class EndOfTheRoundDataModel extends foundry.abstract.DataModel {
   static defineSchema() {
     return {
-      source: makeHtmlField(),
       description: makeHtmlField(),
       enrichedDescription: makeHtmlField(),
       action: action(),
@@ -19,7 +18,6 @@ export default class EndOfTheRoundDataModel extends foundry.abstract.TypeDataMod
 
 export function makeEndOfTheRoundSchema() {
   return new foundry.data.fields.SchemaField({
-    source: makeHtmlField(),
     description: makeHtmlField(),
     enrichedDescription: makeHtmlField(),
     action: action(),

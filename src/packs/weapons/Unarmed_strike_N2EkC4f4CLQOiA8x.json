@@ -8,7 +8,7 @@
   "type": "weapon",
   "data": {
     "description": "",
-    "hands": "off",
+    "hands": "Off",
     "properties": "Finesse",
     "availability": "U",
     "value": "5 ss",

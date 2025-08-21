@@ -12,11 +12,9 @@ import {
   makeStringField
 } from '../helpers.js'
 
-export default class ItemDataModel extends foundry.abstract.TypeDataModel {
+export default class ItemDataModel extends foundry.abstract.DataModel {
   static defineSchema() {
     return {
-      source: makeHtmlField(),
-      properties: makeStringField(),
       description: makeHtmlField(),
       enrichedDescription: makeHtmlField(),
       action: action(),

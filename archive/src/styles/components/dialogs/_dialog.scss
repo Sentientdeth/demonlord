@@ -1,0 +1,188 @@
+.form-block {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 4px 5px;
+  margin-bottom: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 11px;
+
+  .items-list {
+    margin-bottom: 0;
+
+    .affliction {
+      height: 18px;
+
+      input {
+        float: left;
+      }
+
+      label {
+        float: left;
+        margin-top: 5px;
+      }
+
+      .fas {
+        margin-top: 5px;
+        margin-left: 5px;
+      }
+
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 260px;
+        background-color: rgba(0, 0, 0, 0.9);
+        color: #fff;
+        text-align: left;
+        border-radius: 3px;
+        padding: 5px;
+        top: 40px;
+        right: 20px;
+        position: absolute;
+        z-index: 1;
+      }
+
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+      }
+    }
+
+    .grid {
+      gap: 0;
+      margin-top: 0;
+    }
+  }
+
+  .creature-list {
+    margin: 0;
+    padding: 0;
+
+    .creature-entry {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+
+      .header {
+        width: 100%;
+        height: 55px;
+
+        h4 {
+          font-family: 'IM Fell English SC', serif;
+          font-size: 14px;
+        }
+
+        .headerbody {
+          margin-top: -10px;
+        }
+      }
+
+      .effects {
+        .effect {
+          .effectname {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+
+    .token-image {
+      float: left;
+      border: none;
+      height: 48px;
+      width: 48px;
+      margin-right: 10px;
+    }
+  }
+}
+
+.sectionblock {
+  border: 1px solid #666;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.talentactions,
+.combatactions,
+.damageaction,
+.challengeaction {
+  margin-top: 5px;
+  padding: 5px;
+  background: #bbb;
+  border: 1px solid #666;
+  border-radius: 3px;
+  font-size: 12px;
+  height: 27px;
+
+  img {
+    float: left;
+    margin: 0 0 0 -5px;
+    border: 0;
+  }
+
+  div {
+    float: left;
+    padding-left: 5px;
+  }
+
+  .blood {
+    margin-left: -8px;
+    margin-top: 1px;
+  }
+
+  .challenge-img {
+    float: left;
+    height: 22px;
+    width: 22px;
+    margin-top: -3px;
+    margin-left: -5px;
+    background: url('../assets/ui/icons/back-forth2.webp') no-repeat;
+  }
+
+  .init-img {
+    float: left;
+    height: 22px;
+    width: 22px;
+    margin-top: -3px;
+    margin-left: -5px;
+    background: url('../assets/ui/icons/pentagram.webp') no-repeat;
+  }
+
+  .talent-img {
+    float: left;
+    height: 22px;
+    width: 22px;
+    margin-top: -3px;
+    margin-left: -5px;
+    background: url('../assets/ui/icons/barbed-sun2.webp') no-repeat;
+  }
+}
+
+.challengeaction {
+  background: #999;
+}
+
+.dice {
+  margin: 2px;
+  display: inline-flex;
+  width: 25px;
+  height: 25px;
+}
+
+.dice label {
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  z-index: 1;
+  padding-top: 4px;
+}
+
+.dice img {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border: none;
+}
+
+.modifier {
+  margin: 2px;
+  display: inline-flex;
+}

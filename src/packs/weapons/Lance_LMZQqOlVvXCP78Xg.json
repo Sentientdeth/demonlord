@@ -7,7 +7,7 @@
   "type": "weapon",
   "data": {
     "description": "",
-    "hands": "two",
+    "hands": "Two",
     "properties": "One hand while mounted, Reach +2",
     "requirement": {
       "attribute": "Strength",

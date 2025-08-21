@@ -1,0 +1,99 @@
+// Import utilities.
+@import 'utils/typography';
+@import 'utils/colors';
+@import 'utils/mixins';
+@import 'utils/variables';
+@import 'newrules';
+
+/* Global styles */
+@import 'global/window';
+@import 'global/ui'; // A combination of global/ui and dialogs/dialog2 breaks v13 sidebar icons
+@import 'global/grid2';
+
+/* Styles limited to demonlord sheets */
+.charactergenerator {
+  @import 'components/formsCG';
+}
+
+/* Styles limited to demonlord sheets */
+.demonlord.item {
+  @import 'src/styles/components/item-sheets/items2';
+  @import 'src/styles/components/item-sheets/item-sheet';
+}
+
+.demonlord {
+  @import 'src/styles/components/actor-sheets/aside-character';
+  @import 'src/styles/components/actor-sheets/body-character';
+  @import 'components/chat';
+  @import 'src/styles/components/dialogs/dialog';
+  @import 'components/forms';
+  @import 'components/general';
+  @import 'src/styles/components/parts/resource';
+  @import 'src/styles/components/parts/tabs';
+  @import 'src/styles/components/parts/accordion';
+}
+
+.demonlord.actor {
+  @import 'src/styles/components/actor-sheets/header-character';
+}
+
+/* Styles limited to demonlord sheets */
+.creature.item {
+  @import 'src/styles/components/item-sheets/items2';
+}
+
+.creature {
+  @import 'src/styles/components/actor-sheets/aside-creature';
+  @import 'src/styles/components/actor-sheets/body-character';
+  @import 'components/chat';
+  @import 'src/styles/components/dialogs/dialog';
+  @import 'components/forms';
+  @import 'components/general';
+  @import 'src/styles/components/parts/resource';
+  @import 'src/styles/components/parts/tabs';
+  @import 'src/styles/components/actor-sheets/body-creature';
+  @import 'src/styles/components/parts/accordion';
+}
+
+.creature.actor {
+  @import 'src/styles/components/actor-sheets/header-creature';
+}
+
+.vehicle.item {
+  @import 'src/styles/components/item-sheets/items2';
+}
+
+.vehicle {
+  @import 'src/styles/components/actor-sheets/aside-vehicle';
+  @import 'src/styles/components/actor-sheets/body-character';
+  @import 'components/chat';
+  @import 'src/styles/components/dialogs/dialog';
+  @import 'components/forms';
+  @import 'components/general';
+  @import 'src/styles/components/parts/resource';
+  @import 'src/styles/components/parts/tabs';
+  @import 'src/styles/components/actor-sheets/body-vehicle';
+  @import 'src/styles/components/parts/accordion';
+}
+
+.vehicle.actor {
+  @import 'src/styles/components/actor-sheets/header-vehicle';
+}
+
+/* Styles limited to demonlord sheets */
+.playertracker {
+  @import 'src/styles/components/extras/playertracker';
+}
+
+@import 'src/styles/components/dialogs/dialog2'; // A combination of global/ui and dialogs/dialog2 breaks v13 sidebar icons
+
+/*****************/
+/*   V2 Styles   */
+/*****************/
+.demonlord-v2-sheet {
+  @import 'src/styles/v2/sheets';
+}
+
+.demonlord-v2-item {
+  @import 'src/styles/v2/items';
+}

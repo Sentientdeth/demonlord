@@ -64,13 +64,12 @@ export function action() {
     damagetype: makeStringField(),
     boonsbanesactive: makeBoolField(true),
     boonsbanes: makeStringField(),
-    rollbonus: makeStringField(),
     plus20active: makeBoolField(true),
     plus20: makeStringField(),
     plus20damage: makeStringField(),
     defense: makeStringField(),
     defenseboonsbanes: makeStringField(),
-    damagetypes: new foundry.data.fields.ArrayField(new foundry.data.fields.ObjectField({
+    damagetypes: new foundry.data.fields.ArrayField(new foundry.data.fields.SchemaField({
       damage: makeStringField(),
       damagetype: makeStringField()
     })),
@@ -82,8 +81,7 @@ export function action() {
     extraboonsbanes: makeStringField(),
     extradamage: makeStringField(),
     extraplus20damage: makeStringField(),
-    extraEffect: makeStringField(),
-    extraEffect20: makeStringField()
+    extraeffect: makeStringField()
   })
 }
 
@@ -132,7 +130,7 @@ export function contents() {
 }
 
 export function levelItem(makeDataSchema) {
-  return new foundry.data.fields.ObjectField({
+  return new foundry.data.fields.SchemaField({
     system: makeDataSchema(),
     description: new foundry.data.fields.SchemaField({
       value: makeStringField()
@@ -141,7 +139,6 @@ export function levelItem(makeDataSchema) {
     name: makeStringField(),
     pack: makeStringField(),
     selected: makeBoolField(),
-    uuid: makeStringField(),
-    img: makeStringField()
+    uuid: makeStringField()
   })
 }

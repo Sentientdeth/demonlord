@@ -1,0 +1,276 @@
+:root {
+  --demonlord-red: #a22223;
+
+  // Foundry color overrides
+  --color-shadow-primary: #a22223;
+  --color-shadow-highlight: #d22d2d;
+  --color-border-highlight: #d22d2d;
+  --color-border-highlight-alt: #a22223;
+  --color-text-hyperlink: #d22d2d;
+}
+
+// Themes
+body.theme-dark {
+  --demonlord-color-icon: #f7f3e8;
+  --demonlord-color-text-primary: var(--color-text-light-primary);
+  --demonlord-color-text-dim: #77777760;
+  --demonlord-color-border: transparent;
+  --demonlord-color-input-background: #302831;
+  --demonlord-color-hr: var(--color-border-dark-primary);
+  --demonlord-color-hr-highlight: var(--color-border-dark-highlight);
+
+  // Inverted
+  // --demonlord-color-text-inverted-primary: var(--color-dark-2);
+  // --demonlord-color-input-inverted: var(--color-dark-3);
+  --demonlord-color-text-inverted-primary: var(--color-light-2);
+  --demonlord-color-input-inverted: var(--color-light-3);
+}
+
+body.theme-light {
+  --demonlord-color-icon: #303030;
+  --demonlord-color-text-primary: var(--color-text-dark-primary);
+  --demonlord-color-text-dim: #77777760;
+  --demonlord-color-border: var(--color-dark-6);
+  --demonlord-color-border-dim: #77777730;
+  --demonlord-color-input-background: rgba(0, 0, 0, 0.1);
+  --demonlord-color-hr: var(--color-border-light-primary);
+  --demonlord-color-hr-highlight: var(--color-border-light-highlight);
+
+  --demonlord-header-background: url(../assets/ui/sidebar_background.webp) repeat-x local;
+
+  // Inverted
+  --demonlord-color-text-inverted-primary: var(--color-light-2);
+  --demonlord-color-input-inverted: var(--color-light-3);
+
+  // Override select background
+  // TODO: Find a more elegant way?
+  select.input-group-dropdown {
+    background: transparent;
+  }
+}
+
+.window-app .window-header {
+  font-family: $font-header;
+  font-size: 14px;
+}
+
+/* Compendium */
+#compendium h3 {
+  border: 0;
+  background: var(--demonlord-red);
+  color: white;
+  font-family: $font-header;
+  font-size: 16px;
+}
+
+/* Tables */
+.table-results tbody {
+  scrollbar-width: thin;
+  scrollbar-color: var(--demonlord-red) transparent;
+}
+
+/* Editor */
+.editor {
+  scrollbar-width: thin;
+  scrollbar-color: var(--demonlord-red) transparent;
+}
+
+/* Cards */
+.cards {
+  scrollbar-width: thin;
+  scrollbar-color: var(--demonlord-red) transparent;
+}
+
+/* Chat */
+#chat-controls {
+  border-top: 2px groove var(--demonlord-red);
+  padding-top: 5px;
+}
+
+#chat-log {
+  scrollbar-width: thin;
+  scrollbar-color: var(--demonlord-red) transparent;
+}
+
+#chat-log .message .message-header .message-sender,
+#chat-log .message .message-header .message-metadata {
+  font-family: $font-header;
+}
+
+/* Scrollbars */
+.scrollable {
+  scrollbar-width: thin;
+  scrollbar-color: var(--demonlord-red) transparent;
+}
+
+/* Hotbar */
+#hotbar {
+  font-family: $font-header;
+}
+
+#hotbar .macro:hover,
+#hotbar .bar-controls:hover {
+  box-shadow: none;
+  border: 1px solid var(--demonlord-red);
+}
+
+/* Navigation */
+#navigation #nav-toggle,
+#navigation #scene-list #nav-item {
+  background-color: black;
+  border-radius: 3px;
+  border: 1px solid #666;
+}
+
+#navigation #scene-list .scene {
+  background: black;
+  border: 1px solid #666;
+  border-radius: 3px;
+  font-family: $font-header;
+  font-size: 13px;
+}
+
+#navigation #scene-list .scene.gm {
+  background: black;
+  border: 1px solid var(--demonlord-red);
+}
+
+#navigation #scene-list .scene.view {
+  border: 1px solid var(--demonlord-red);
+  box-shadow: none;
+  background: black;
+  color: white;
+}
+
+/* Controls */
+#controls .scene-control.active,
+#controls .control-tool.active,
+#controls .scene-control:hover,
+#controls .control-tool:hover {
+  box-shadow: 0 0 10px red;
+  border: 1px solid var(--demonlord-red);
+}
+
+#controls .scene-control,
+#controls .control-tool {
+  background-color: black;
+  border-radius: 3px;
+  border: 1px solid #666;
+}
+
+#controls .scene-control,
+#controls .control-tool {
+  box-shadow: none;
+}
+
+/* Players */
+#players {
+  font-family: $font-header;
+  font-size: 11px;
+  text-transform: uppercase;
+  //border: 1px solid #666;
+}
+
+#players ol .player-name.self {
+  color: var(--demonlord-red);
+}
+
+/* Combat Tracker */
+#combat #combat-round .encounters h3,
+#combat #combat-controls a.center {
+  font-family: $font-header;
+  font-size: 16px;
+}
+
+#combat #combat-endofround {
+  border-top: 2px groove var(--demonlord-red);
+}
+
+#combat #combat-round {
+  border-bottom: 2px groove var(--demonlord-red);
+}
+
+#combat #combat-controls {
+  border-top: 2px groove var(--demonlord-red);
+}
+
+#combat li.combatant .token-initiative {
+  font-family: $font-header;
+}
+
+/* Scene */
+#scenes .scene h3 {
+  font-family: $font-header;
+  font-size: 16px;
+}
+
+#navigation {
+  left: 170px;
+}
+
+#logo {
+  content: url('../assets/ui/demonlord-logo-red.png');
+  max-width: 86px;
+  max-height: 50px;
+  -webkit-filter: drop-shadow(0px 2px 1px #222);
+  filter: drop-shadow(0px 2px 1px #222);
+}
+
+#pause {
+  background: none;
+}
+
+#pause > img {
+  content: url('../assets/ui/pentagram-pause.png');
+  width: 200px;
+  height: 200px;
+  top: -50px;
+  left: calc(50% - 100px);
+  opacity: 0.7;
+  animation-duration: 10s;
+}
+
+#pause h3 {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 32px;
+  text-shadow: 0 3px 5px rgba(0, 0, 0, 1);
+}
+
+/* File Selector */
+.paths {
+  scrollbar-width: thin;
+  scrollbar-color: var(--demonlord-red) transparent;
+}
+
+.folders-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--demonlord-red) transparent;
+}
+
+.encounter-difficulty {
+  align-items : center;
+  border-radius: 3px; 
+  box-sizing: border-box;
+  display: block;
+  flex-basis: 0%;
+  flex-grow:  1;
+  flex-shrink: 1;
+  text-align: center;   
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);    
+}
+
+.encounter-difficulty[data-rating="easy"] {
+    background-color: #478948;
+}
+
+.encounter-difficulty[data-rating="average"] {
+    background-color: #3b88ae;
+}
+
+.encounter-difficulty[data-rating="challenging"] {
+    background-color: #f99305;
+}
+
+.encounter-difficulty[data-rating="hard"] {
+    background-color: #ba4b49;
+}

@@ -1,6 +1,4 @@
-import {capitalize} from '../utils/utils'
-
-const { TextEditor } = foundry.applications.ux //eslint-disable-line no-shadow
+import {capitalize, enrichHTMLUnrolled} from '../utils/utils'
 
 /* -------------------------------------------- */
 /*  Class Models                                */
@@ -14,104 +12,69 @@ export class PathLevel {
 
     const locAtt = s => game.i18n.localize('DL.Attribute' + capitalize(s))
 
-    const level = {}
+    this.level = obj.level || 0
+    this.attributeSelect = obj.attributeSelect || ''
+    this.attributeSelectIsChooseTwo = obj.attributeSelectIsChooseTwo || obj.attributeSelect === 'choosetwo' || false
+    this.attributeSelectIsChooseThree =
+      obj.attributeSelectIsChooseThree || obj.attributeSelect === 'choosethree' || false
+    this.attributeSelectIsFixed = obj.attributeSelectIsFixed || obj.attributeSelect === 'fixed' || false
+    this.attributeSelectIsTwoSet = obj.attributeSelectIsTwoSet || obj.attributeSelect === 'twosets' || false
 
-    level.level = obj.level || 1
-    level.attributeSelect = obj.attributeSelect || ''
-    level.attributeSelectIsChooseTwo = obj.attributeSelectIsChooseTwo || obj.attributeSelect === 'choosetwo' || false
-    level.attributeSelectIsChooseThree = obj.attributeSelectIsChooseThree || obj.attributeSelect === 'choosethree' || false
-    level.attributeSelectIsFixed = obj.attributeSelectIsFixed || obj.attributeSelect === 'fixed' || false
-    level.attributeSelectIsTwoSet = obj.attributeSelectIsTwoSet || obj.attributeSelect === 'twosets' || false
+    this.attributeSelectTwoSet1 = obj.attributeSelectTwoSet1 || ''
+    this.attributeSelectTwoSet2 = obj.attributeSelectTwoSet2 || ''
+    this.attributeSelectTwoSet3 = obj.attributeSelectTwoSet3 || ''
+    this.attributeSelectTwoSet4 = obj.attributeSelectTwoSet4 || ''
 
-    level.attributeSelectTwoSet1 = obj.attributeSelectTwoSet1 || ''
-    level.attributeSelectTwoSet2 = obj.attributeSelectTwoSet2 || ''
-    level.attributeSelectTwoSet3 = obj.attributeSelectTwoSet3 || ''
-    level.attributeSelectTwoSet4 = obj.attributeSelectTwoSet4 || ''
+    this.attributeSelectTwoSet1Label = obj.attributeSelectTwoSet1Label || locAtt(this.attributeSelectTwoSet1) || ''
+    this.attributeSelectTwoSet2Label = obj.attributeSelectTwoSet2Label || locAtt(this.attributeSelectTwoSet2) || ''
+    this.attributeSelectTwoSet3Label = obj.attributeSelectTwoSet3Label || locAtt(this.attributeSelectTwoSet3) || ''
+    this.attributeSelectTwoSet4Label = obj.attributeSelectTwoSet4Label || locAtt(this.attributeSelectTwoSet4) || ''
 
-    level.attributeSelectTwoSet1Label = obj.attributeSelectTwoSet1Label || locAtt(level.attributeSelectTwoSet1) || ''
-    level.attributeSelectTwoSet2Label = obj.attributeSelectTwoSet2Label || locAtt(level.attributeSelectTwoSet2) || ''
-    level.attributeSelectTwoSet3Label = obj.attributeSelectTwoSet3Label || locAtt(level.attributeSelectTwoSet3) || ''
-    level.attributeSelectTwoSet4Label = obj.attributeSelectTwoSet4Label || locAtt(level.attributeSelectTwoSet4) || ''
+    this.attributeSelectTwoSetValue1 = +obj.attributeSelectTwoSetValue1 || 0
+    this.attributeSelectTwoSetValue2 = +obj.attributeSelectTwoSetValue2 || 0
+    this.attributeSelectTwoSetSelectedValue1 = +obj.attributeSelectTwoSetSelectedValue1 || true
+    this.attributeSelectTwoSetSelectedValue2 = +obj.attributeSelectTwoSetSelectedValue2 || true
 
-    level.attributeSelectTwoSetValue1 = +obj.attributeSelectTwoSetValue1 || 0
-    level.attributeSelectTwoSetValue2 = +obj.attributeSelectTwoSetValue2 || 0
-    level.attributeSelectTwoSetSelectedValue1 = +obj.attributeSelectTwoSetSelectedValue1 || true
-    level.attributeSelectTwoSetSelectedValue2 = +obj.attributeSelectTwoSetSelectedValue2 || true
+    this.attributeStrength = +obj.attributeStrength || 0
+    this.attributeAgility = +obj.attributeAgility || 0
+    this.attributeIntellect = +obj.attributeIntellect || 0
+    this.attributeWill = +obj.attributeWill || 0
+    this.attributeStrengthSelected = +obj.attributeStrengthSelected || false
+    this.attributeAgilitySelected = +obj.attributeAgilitySelected || false
+    this.attributeIntellectSelected = +obj.attributeIntellectSelected || false
+    this.attributeWillSelected = +obj.attributeWillSelected || false
 
-    level.attributes = {
-      strength: {
-        value: +obj.attributes?.strength?.value || 0,
-        formula: obj.attributes?.strength?.formula || '',
-        immune: obj.attributes?.strength?.immune || false,
-        selected: +obj.attributes?.strength?.selected || false,
-      },
-      agility: {
-        value: +obj.attributes?.agility?.value || 0,
-        formula: obj.attributes?.agility?.formula || '',
-        immune: obj.attributes?.agility?.immune || false,
-        selected: +obj.attributes?.agility?.selected || false,
-      },
-      intellect: {
-        value: +obj.attributes?.intellect?.value || 0,
-        formula: obj.attributes?.intellect?.formula || '',
-        immune: obj.attributes?.intellect?.immune || false,
-        selected: +obj.attributes?.intellect?.selected || false,
-      },
-      will: {
-        value: +obj.attributes?.will?.value || 0,
-        formula: obj.attributes?.will?.formula || '',
-        immune: obj.attributes?.will?.immune || false,
-        selected: +obj.attributes?.will?.selected || false,
-      }
-    }
+    this.characteristicsPerception = +obj.characteristicsPerception || 0
+    this.characteristicsDefense = +obj.characteristicsDefense || 0
+    this.characteristicsPower = +obj.characteristicsPower || 0
+    this.characteristicsSpeed = +obj.characteristicsSpeed || 0
+    this.characteristicsHealth = +obj.characteristicsHealth || 0
+    this.characteristicsCorruption = +obj.characteristicsCorruption || 0
+    this.characteristicsInsanity = +obj.characteristicsInsanity || 0
 
-    level.characteristics = {
-      health: +obj.characteristics?.health || 0,
-      healingRate: +obj.characteristics?.healingRate || 0,
-      size: obj.characteristics?.size || '1',
-      defense: +obj.characteristics?.defense || 0,
-      perception: +obj.characteristics?.perception || 0,
-      speed: +obj.characteristics?.speed || 0,
-      power: +obj.characteristics?.power || 0,
-      insanity: {
-        value: +obj.characteristics?.insanity?.value || 0,
-        formula: obj.characteristics?.insanity?.formula || '',
-        immune: obj.characteristics?.insanity?.immune || false,
-      },
-      corruption: {
-        value: +obj.characteristics?.corruption?.value || 0,
-        formula: obj.characteristics?.corruption?.formula || '',
-        immune: obj.characteristics?.corruption?.immune || false,
-      }
-    }
+    this.languagesText = obj.languagesText || ''
+    this.equipmentText = obj.equipmentText || ''
+    this.magicText = obj.magicText || ''
 
-    level.languagesText = obj.languagesText || ''
-    level.equipmentText = obj.equipmentText || ''
-    level.magicText = obj.magicText || ''
-    level.optionsText = obj.optionsText || ''
-
-    level.talentsSelect = obj.talentsSelect || ''
-    level.talentsChooseOne = obj.talentsChooseOne || false
-    level.talentsSelected = obj.talentsSelected || []
-    level.talents = obj.talents || []
-    level.spells = obj.spells || []
-    level.talentspick = obj.talents || []
-    level.languages = obj.languages || []
-    
-    return level
+    this.talentsSelect = obj.talentsSelect || ''
+    this.talentsChooseOne = obj.talentsChooseOne || false
+    this.talentsSelected = obj.talentsSelected || []
+    this.talents = obj.talents || []
+    this.spells = obj.spells || []
+    this.talentspick = obj.talents || []
+    this.languages = obj.languages || []
   }
-
 }
 
 Handlebars.registerHelper('hasCharacteristics', level => {
   return (
-    level.characteristics.perception ||
-    level.characteristics.defense ||
-    level.characteristics.power ||
-    level.characteristics.speed ||
-    level.characteristics.health ||
-    (level.characteristics.corruption.value || level.characteristics.corruption.formula) ||
-    (level.characteristics.insanity.value || level.characteristics.insanity.formula)
+    level.characteristicsPerception ||
+    level.characteristicsDefense ||
+    level.characteristicsPower ||
+    level.characteristicsSpeed ||
+    level.characteristicsHealth ||
+    level.characteristicsCorruption ||
+    level.characteristicsInsanity
   )
 })
 
@@ -125,7 +88,6 @@ export class PathLevelItem {
     this.description = obj.description || ''
     this.pack = obj.pack || ''
     this.selected = Boolean(obj.selected) || false
-    this.img = obj.img
   }
 }
 
@@ -230,10 +192,10 @@ export async function getNestedItemData(nestedData) {
 
   // Remember user selection & enrich description
   itemData.selected = nestedData.selected
-  itemData.system.enrichedDescription = await TextEditor.implementation.enrichHTML(itemData?.system?.description, {
+  itemData.system.enrichedDescription = await TextEditor.enrichHTML(itemData?.system?.description, {
   aync: true})
 
-  itemData.system.enrichedDescriptionUnrolled = await TextEditor.implementation.enrichHTML(itemData?.system?.description, { unrolled: true })
+  itemData.system.enrichedDescriptionUnrolled = await enrichHTMLUnrolled(itemData?.system?.description)
 
   // Keep the quantity previously stored, if any
   itemData.system.quantity = nestedData?.system?.quantity ?? itemData.system.quantity
@@ -304,12 +266,11 @@ export async function handleLevelChange(actor, newLevel, curLevel = undefined) {
         .filter(l => +l.level > curLevel && +l.level <= newLevel)
         .map(async level => await createActorNestedItems(actor, _getLevelItemsToTransfer(level), path.id, level.level)))
     }
-
-    // Also ancestry levels' nested items
-    if (ancestry) {
-      await Promise.all(ancestry.system.levels
-        .filter(l => +l.level > curLevel && +l.level <= newLevel)
-        .map(async level => await createActorNestedItems(actor, _getLevelItemsToTransfer(level), ancestry.id, level.level)))
+    // Add ancestry level 4 nested items
+    if (ancestry && curLevel < 4 && newLevel >= 4) {
+      const ancestryData = ancestry.system
+      let chosenNestedItems = [...ancestryData.level4.talent, ...ancestryData.level4.spells].filter(i => Boolean(i.selected))
+      await createActorNestedItems(actor, chosenNestedItems, ancestry.id, 4)
     }
   }
   // Otherwise delete items with levelRequired > newLevel
@@ -323,15 +284,15 @@ export async function handleLevelChange(actor, newLevel, curLevel = undefined) {
 /* -------------------------------------------- */
 
 export async function handleCreateAncestry(actor, ancestryItem) {
-  const actorLevel = parseInt(actor.system.level)
   const ancestryData = ancestryItem.system
-  const leqLevels = ancestryData.levels.filter(l => +l.level <= +actorLevel)
-
-  // For each level that is <= actor level, add all talents and *selected* nested items
-  for await (let level of leqLevels) {
-    await createActorNestedItems(actor, _getLevelItemsToTransfer(level), ancestryItem.id, level.level)
+  let nestedItems = [...ancestryData.talents, ...ancestryData.languagelist]
+  let createdItems = await createActorNestedItems(actor, nestedItems, ancestryItem.id, 0)
+  // If character level >= 4, add chosen nested items
+  if (actor.system.level >= 4) {
+    let chosenNestedItems = [...ancestryData.level4.talent, ...ancestryData.level4.spells].filter(i => Boolean(i.selected))
+    createdItems = createdItems.concat(await createActorNestedItems(actor, chosenNestedItems, ancestryItem.id, 4))
   }
-  return await Promise.resolve()
+  return createdItems
 }
 
 /* -------------------------------------------- */

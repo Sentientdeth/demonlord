@@ -5,10 +5,9 @@ import {
   makeHtmlField,
 } from '../helpers.js'
 
-export default class AmmoDataModel extends foundry.abstract.TypeDataModel {
+export default class AmmoDataModel extends foundry.abstract.DataModel {
   static defineSchema() {
     return {
-      source: makeHtmlField(),
       description: makeHtmlField(),
       enrichedDescription: makeHtmlField(),
       properties: makeStringField(),

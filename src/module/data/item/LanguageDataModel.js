@@ -1,9 +1,8 @@
 import { makeBoolField, makeHtmlField } from '../helpers.js'
 
-export default class LanguageDataModel extends foundry.abstract.TypeDataModel {
+export default class LanguageDataModel extends foundry.abstract.DataModel {
   static defineSchema() {
     return {
-      source: makeHtmlField(),
       description: makeHtmlField(),
       enrichedDescription: makeHtmlField(),
       read: makeBoolField(),
@@ -15,7 +14,6 @@ export default class LanguageDataModel extends foundry.abstract.TypeDataModel {
 
 export function makeLanguageSchema() {
   return new foundry.data.fields.SchemaField({
-    source: makeHtmlField(),
     description: makeHtmlField(),
     enrichedDescription: makeHtmlField(),
     read: makeBoolField(),

@@ -144,29 +144,31 @@
         <div class="speed">{{system.characteristics.speed}}</div>
       </div>
     </div>
+    <div class="chars grid grid-2">
+      <div class="speedbox">
+        <div class="speedtext">{{localize "DL.CharFortune"}}</div>
+        <div class="speed">
+          <input
+                  name="system.characteristics.fortune"
+                  type="text"
+                  value="{{system.characteristics.fortune}}"
+                  data-dtype="Number"
+                  placeholder=""
+          />
+        </div>
+      </div>
+      <div></div>
+    </div>
     <div class="chars flexrow">
-      {{#unless hideFortune}}
-        <div class="fortune">
-          <label class="switchTurn">
-            <input type="checkbox" id="system.characteristics.fortune" name="system.characteristics.fortune" {{checked system.characteristics.fortune}} {{disabled fortuneAwardPrevented}}/>
-            <div class="slider roundGrey">
-                <span class="on">{{localize "DL.CharFortune"}}</span
-                ><span class="offGrey">{{localize "DL.CharFortune"}}</span>
-            </div>
-          </label>
-        </div>
-      {{/unless}}
-      {{#unless hideTurnMode}}
-        <div class="turnmode">
-          <label class="switchTurn">
-            <input type="checkbox" id="system.fastturn" name="system.fastturn" {{checked system.fastturn}} />
-            <div class="slider round">
-                <span class="on">{{localize "DL.TurnFastButton"}}</span
-                ><span class="off">{{localize "DL.TurnSlowButton"}}</span>
-            </div>
-          </label>
-        </div>
-      {{/unless}}
+      <div class="turnmode">
+        <label class="switchTurn">
+          <input type="checkbox" id="system.fastturn" name="system.fastturn" {{checked system.fastturn}} />
+          <div class="slider round">
+              <span class="on">{{localize "DL.TurnFastButton"}}</span
+              ><span class="off">{{localize "DL.TurnSlowButton"}}</span>
+          </div>
+        </label>
+      </div>
     </div>
   </div>
 </aside>

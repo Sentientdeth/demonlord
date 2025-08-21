@@ -1,10 +1,9 @@
 import { action, activatedEffect } from '../common.js'
 import { makeBoolField, makeHtmlField, makeIntField, makeStringField } from '../helpers.js'
 
-export default class WeaponDataModel extends foundry.abstract.TypeDataModel {
+export default class WeaponDataModel extends foundry.abstract.DataModel {
   static defineSchema() {
     return {
-      source: makeHtmlField(),
       description: makeHtmlField(),
       action: action(),
       activatedEffect: activatedEffect(),
@@ -30,7 +29,6 @@ export default class WeaponDataModel extends foundry.abstract.TypeDataModel {
 
 export function makeWeaponSchema() {
   return new foundry.data.fields.SchemaField({
-    source: makeHtmlField(),
     description: makeHtmlField(),
     action: action(),
     activatedEffect: activatedEffect(),

@@ -8,7 +8,7 @@
   "type": "weapon",
   "data": {
     "description": "",
-    "hands": "one",
+    "hands": "One",
     "properties": "",
     "requirement": {
       "attribute": "Strength",

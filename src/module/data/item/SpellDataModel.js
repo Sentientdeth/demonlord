@@ -1,10 +1,9 @@
 import { action, activatedEffect } from '../common.js'
 import { makeBoolField, makeHtmlField, makeIntField, makeStringField } from '../helpers.js'
 
-export default class SpellDataModel extends foundry.abstract.TypeDataModel {
+export default class SpellDataModel extends foundry.abstract.DataModel {
   static defineSchema() {
     return {
-      source: makeHtmlField(),
       description: makeHtmlField(),
       enrichedDescription: makeHtmlField(),
       action: action(),
